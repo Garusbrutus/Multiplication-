@@ -1,504 +1,510 @@
-import { useState, useCallback } from “react”;
+<!DOCTYPE html>
 
-const BOX_WEIGHTS = { 1: 8, 2: 4, 3: 2, 4: 1 };
-
-function buildInitialDeck(selectedTables, existingDeck) {
-const deck = […existingDeck];
-selectedTables.forEach((t) => {
-for (let i = 1; i <= 10; i++) {
-if (!deck.find((c) => c.a === t && c.b === i)) {
-deck.push({ a: t, b: i, box: 1 });
-}
-}
-});
-return deck;
-}
-
-function pickCard(deck, selectedTables) {
-const activeDeck = deck.filter((c) => selectedTables.includes(c.a) && c.box < 5);
-if (activeDeck.length === 0) return null;
-const pool = [];
-activeDeck.forEach((card) => {
-const w = BOX_WEIGHTS[card.box] || 1;
-for (let i = 0; i < w; i++) pool.push(card);
-});
-return pool[Math.floor(Math.random() * pool.length)];
-}
-
-export default function App() {
-const [screen, setScreen] = useState(“setup”); // setup | game | done
-const [selectedTables, setSelectedTables] = useState([]);
-const [deck, setDeck] = useState([]);
-const [currentCard, setCurrentCard] = useState(null);
-const [input, setInput] = useState(””);
-const [locked, setLocked] = useState(false);
-const [cardState, setCardState] = useState(””); // correct | wrong | “”
-const [animCard, setAnimCard] = useState(””); // fly-right | fly-left | shake
-const [feedback, setFeedback] = useState(null); // null | { type, correct }
-const [pulseBox, setPulseBox] = useState(null);
-
-const toggleTable = (n) => {
-setSelectedTables((prev) =>
-prev.includes(n) ? prev.filter((x) => x !== n) : […prev, n]
-);
-};
-
-const startGame = () => {
-const newDeck = buildInitialDeck(selectedTables, deck);
-setDeck(newDeck);
-const card = pickCard(newDeck, selectedTables);
-setCurrentCard(card);
-setInput(””);
-setLocked(false);
-setCardState(””);
-setAnimCard(””);
-setFeedback(null);
-setScreen(card ? “game” : “done”);
-};
-
-const boxCounts = (d, sel) => {
-const active = d.filter((c) => sel.includes(c.a));
-const counts = {};
-for (let i = 1; i <= 5; i++) counts[i] = active.filter((c) => c.box === i).length;
-return counts;
-};
-
-const numPress = (d) => {
-if (locked) return;
-if (input.length >= 3) return;
-setInput((prev) => prev + String(d));
-};
-
-const numDel = () => {
-if (locked) return;
-setInput((prev) => prev.slice(0, -1));
-};
-
-const checkAnswer = () => {
-if (locked || input === “”) return;
-const userAnswer = parseInt(input);
-const correctAnswer = currentCard.a * currentCard.b;
-const isCorrect = userAnswer === correctAnswer;
-setLocked(true);
-setCardState(isCorrect ? “correct” : “wrong”);
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Champion des Tables</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
 ```
-if (isCorrect) {
-  setAnimCard("fly-right");
-  const nextBox = Math.min(currentCard.box + 1, 5);
-  setTimeout(() => {
-    const newDeck = deck.map((c) =>
-      c === currentCard ? { ...c, box: nextBox } : c
-    );
-    setDeck(newDeck);
-    setPulseBox(nextBox);
-    setTimeout(() => setPulseBox(null), 420);
-    const next = pickCard(newDeck, selectedTables);
-    setCurrentCard(next);
-    setInput("");
-    setLocked(false);
-    setCardState("");
-    setAnimCard("");
-    setFeedback(null);
-    if (!next) setScreen("done");
-  }, 460);
-} else {
-  setAnimCard("shake");
-  setTimeout(() => {
-    setAnimCard("");
-    setFeedback({ correctAnswer });
-  }, 460);
-}
-```
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: #f0f4f8;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        padding: 12px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
 
-};
+    .container {
+        background: white;
+        padding: 16px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 420px;
+        text-align: center;
+    }
 
-const handleWrong = () => {
-setAnimCard(“fly-left”);
-setTimeout(() => {
-const newDeck = deck.map((c) =>
-c === currentCard ? { …c, box: 1 } : c
-);
-setDeck(newDeck);
-setPulseBox(1);
-setTimeout(() => setPulseBox(null), 420);
-const next = pickCard(newDeck, selectedTables);
-setCurrentCard(next);
-setInput(””);
-setLocked(false);
-setCardState(””);
-setAnimCard(””);
-setFeedback(null);
-if (!next) setScreen(“done”);
-}, 460);
-};
+    h1 { color: #2c3e50; font-size: 1.4rem; margin-bottom: 4px; }
 
-const backToMenu = () => {
-setScreen(“setup”);
-setCurrentCard(null);
-setInput(””);
-setLocked(false);
-setCardState(””);
-setAnimCard(””);
-setFeedback(null);
-};
+    /* ── SETUP ── */
+    .selection-menu {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin: 12px 0;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 12px;
+    }
+    .table-btn {
+        padding: 12px 5px;
+        border: 2px solid #3498db;
+        border-radius: 10px;
+        cursor: pointer;
+        background: white;
+        font-weight: bold;
+        font-size: 0.9rem;
+        transition: 0.2s;
+    }
+    .table-btn.active { background: #3498db; color: white; }
+    .btn-start {
+        width: 100%; padding: 15px;
+        font-size: 1rem; border: none;
+        border-radius: 12px; cursor: pointer;
+        font-weight: bold; background: #3498db; color: white;
+    }
+    .btn-start:disabled { background: #bdc3c7; cursor: default; }
+    .reset-btn {
+        background: none; color: #bdc3c7;
+        font-size: 0.7rem; border: none;
+        cursor: pointer; margin-top: 16px;
+    }
 
-const resetAll = () => {
-if (window.confirm(“Veux-tu vraiment recommencer à zéro ?”)) {
-setDeck([]);
-setSelectedTables([]);
-setCurrentCard(null);
-setScreen(“setup”);
-}
-};
+    /* ── GAME ── */
+    #game-screen { display: flex; flex-direction: column; gap: 10px; }
 
-const counts = boxCounts(deck, selectedTables);
-const buildings = [
-{ id: 1, icon: “🛖”, label: “Cabane” },
-{ id: 2, icon: “🏠”, label: “Maison” },
-{ id: 3, icon: “🏯”, label: “Manoir” },
-{ id: 4, icon: “🏰”, label: “Chateau” },
-{ id: 5, icon: “👑”, label: “Palais” },
-];
+    /* Flashcard */
+    .card {
+        width: 100%;
+        height: 120px;
+        background: #fff;
+        border: 4px solid #3498db;
+        border-radius: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 3.2rem;
+        font-weight: bold;
+        transition: border-color 0.3s;
+        position: relative;
+        overflow: visible;
+    }
+    .card.correct { border-color: #2ecc71; }
+    .card.wrong   { border-color: #e74c3c; }
 
-const activeBox = currentCard ? currentCard.box : screen === “done” ? 5 : 0;
-
-return (
-<div style={styles.body}>
-<div style={styles.container}>
-<h1 style={styles.h1}>Champion des Tables 🏆</h1>
-
-```
-    {/* SETUP */}
-    {screen === "setup" && (
-      <div>
-        <p style={styles.subtitle}>Choisis tes tables de travail :</p>
-        <div style={styles.selectionMenu}>
-          {[2,3,4,5,6,7,8,9,10].map((n) => (
-            <button
-              key={n}
-              onClick={() => toggleTable(n)}
-              style={{
-                ...styles.tableBtn,
-                ...(selectedTables.includes(n) ? styles.tableBtnActive : {}),
-              }}
-            >
-              x {n}
-            </button>
-          ))}
-        </div>
-        <button
-          onClick={startGame}
-          disabled={selectedTables.length === 0}
-          style={{
-            ...styles.btnStart,
-            ...(selectedTables.length === 0 ? styles.btnStartDisabled : {}),
-          }}
-        >
-          Commencer l'entraînement
-        </button>
-        <br />
-        <button onClick={resetAll} style={styles.resetBtn}>
-          Effacer toute la progression
-        </button>
-      </div>
-    )}
-
-    {/* GAME */}
-    {(screen === "game" || screen === "done") && (
-      <div style={styles.gameScreen}>
-        {/* Flashcard */}
-        <div
-          style={{
-            ...styles.card,
-            ...(cardState === "correct" ? styles.cardCorrect : {}),
-            ...(cardState === "wrong" ? styles.cardWrong : {}),
-            animation:
-              animCard === "fly-right"
-                ? "flyRight 0.45s ease forwards"
-                : animCard === "fly-left"
-                ? "flyLeft 0.45s ease forwards"
-                : animCard === "shake"
-                ? "shake 0.45s ease"
-                : "none",
-          }}
-        >
-          {screen === "done"
-            ? "FINI ! ✨"
-            : currentCard
-            ? `${currentCard.a} x ${currentCard.b}`
-            : "?"}
-        </div>
-
-        {/* Answer display */}
-        {screen === "game" && (
-          <div
-            style={{
-              ...styles.answerDisplay,
-              ...(input === "" ? styles.answerEmpty : {}),
-              ...(cardState === "correct" ? styles.answerCorrect : {}),
-              ...(cardState === "wrong" ? styles.answerWrong : {}),
-            }}
-          >
-            {input === "" ? "?" : input}
-          </div>
-        )}
-
-        {/* Feedback */}
-        <div style={styles.feedback}>
-          {screen === "done" && (
-            <p style={{ ...styles.feedbackMsg, color: "#2ecc71" }}>
-              Toutes les tables sont au Palais !
-            </p>
-          )}
-          {feedback && (
-            <>
-              <p style={{ ...styles.feedbackMsg, color: "#e74c3c" }}>
-                ❌ Faux ! C'était <strong>{feedback.correctAnswer}</strong>
-              </p>
-              <button onClick={handleWrong} style={styles.btnUnderstood}>
-                C'est compris
-              </button>
-            </>
-          )}
-          {cardState === "correct" && !feedback && (
-            <p style={{ ...styles.feedbackMsg, color: "#2ecc71" }}>✅ Bravo !</p>
-          )}
-        </div>
-
-        {/* Numpad */}
-        {screen === "game" && (
-          <div style={styles.numpad}>
-            {[7,8,9,4,5,6,1,2,3].map((d) => (
-              <button key={d} onClick={() => numPress(d)} style={styles.numBtn}>
-                {d}
-              </button>
-            ))}
-            <button onClick={numDel} style={{ ...styles.numBtn, ...styles.numBtnDel }}>⌫</button>
-            <button onClick={() => numPress(0)} style={styles.numBtn}>0</button>
-            <button
-              onClick={checkAnswer}
-              style={{
-                ...styles.numBtn,
-                ...styles.numBtnOk,
-                ...(input === "" ? styles.numBtnOkDisabled : {}),
-              }}
-            >
-              OK
-            </button>
-          </div>
-        )}
-
-        {/* Buildings */}
-        <div style={styles.buildings}>
-          {buildings.map((b) => {
-            const isActive = activeBox === b.id;
-            const isPulse = pulseBox === b.id;
-            return (
-              <div key={b.id} style={styles.building}>
-                <div
-                  style={{
-                    ...styles.buildingIcon,
-                    ...(isActive ? styles.buildingIconActive : {}),
-                    animation: isPulse ? "buildingPop 0.4s ease" : "none",
-                  }}
-                >
-                  {b.icon}
-                </div>
-                <div
-                  style={{
-                    ...styles.buildingCount,
-                    ...(isActive ? styles.buildingCountActive : {}),
-                  }}
-                >
-                  {counts[b.id] || 0}
-                </div>
-                <div
-                  style={{
-                    ...styles.buildingLabel,
-                    ...(isActive ? styles.buildingLabelActive : {}),
-                  }}
-                >
-                  {b.label}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <button onClick={backToMenu} style={styles.linkBtn}>
-          Changer de tables
-        </button>
-      </div>
-    )}
-  </div>
-
-  <style>{`
     @keyframes shake {
-      0%,100% { transform: translateX(0); }
-      20%      { transform: translateX(-10px); }
-      40%      { transform: translateX(10px); }
-      60%      { transform: translateX(-6px); }
-      80%      { transform: translateX(6px); }
+        0%,100% { transform: translateX(0); }
+        20%      { transform: translateX(-10px); }
+        40%      { transform: translateX(10px); }
+        60%      { transform: translateX(-6px); }
+        80%      { transform: translateX(6px); }
     }
     @keyframes flyRight {
-      0%   { transform: scale(1) translate(0,0); opacity: 1; }
-      100% { transform: scale(0.12) translate(200px, 100px); opacity: 0; }
+        0%   { transform: scale(1) translate(0,0); opacity: 1; }
+        100% { transform: scale(0.12) translate(200px, 100px); opacity: 0; }
     }
     @keyframes flyLeft {
-      0%   { transform: scale(1) translate(0,0); opacity: 1; }
-      100% { transform: scale(0.12) translate(-200px, 100px); opacity: 0; }
+        0%   { transform: scale(1) translate(0,0); opacity: 1; }
+        100% { transform: scale(0.12) translate(-200px, 100px); opacity: 0; }
     }
+    .card.anim-shake     { animation: shake 0.45s ease; }
+    .card.anim-fly-right { animation: flyRight 0.45s ease forwards; }
+    .card.anim-fly-left  { animation: flyLeft 0.45s ease forwards; }
+
+    /* Answer display */
+    .answer-display {
+        width: 100%;
+        padding: 12px;
+        font-size: 2.2rem;
+        font-weight: bold;
+        border: 3px solid #3498db;
+        border-radius: 12px;
+        text-align: center;
+        background: #f0f7ff;
+        color: #2c3e50;
+        min-height: 62px;
+        letter-spacing: 2px;
+    }
+    .answer-display.empty { color: #bdc3c7; }
+    .answer-display.correct { border-color: #2ecc71; background: #eafaf1; }
+    .answer-display.wrong   { border-color: #e74c3c; background: #fdf0f0; }
+
+    /* Feedback */
+    .feedback {
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .feedback-msg { font-size: 1rem; font-weight: bold; }
+    .feedback-msg.correct { color: #2ecc71; }
+    .feedback-msg.wrong   { color: #e74c3c; }
+    .btn-understood {
+        padding: 12px 22px; font-size: 0.95rem;
+        border: none; border-radius: 12px;
+        cursor: pointer; font-weight: bold;
+        background: #e74c3c; color: white;
+    }
+
+    /* Numpad */
+    .numpad {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+    .num-btn {
+        padding: 0;
+        height: 58px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        border: 2px solid #dde3ea;
+        border-radius: 12px;
+        cursor: pointer;
+        background: white;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.1s, transform 0.1s;
+        user-select: none;
+    }
+    .num-btn:active { background: #eaf2fb; transform: scale(0.94); }
+    .num-btn.del { background: #fef3e8; border-color: #f5cba7; color: #e67e22; font-size: 1.3rem; }
+    .num-btn.del:active { background: #fde8cc; }
+    .num-btn.ok  { background: #3498db; border-color: #2980b9; color: white; font-size: 1.1rem; }
+    .num-btn.ok:active  { background: #2980b9; }
+    .num-btn.ok.disabled { background: #bdc3c7; border-color: #bdc3c7; cursor: default; }
+
+    /* Buildings */
+    .buildings {
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-end;
+        padding: 8px 0 2px 0;
+        border-top: 2px solid #f0f4f8;
+    }
+    .building {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        flex: 1;
+    }
+    .building .icon {
+        font-size: 1.5rem;
+        line-height: 1;
+        filter: grayscale(0.6) opacity(0.45);
+        transition: transform 0.2s, filter 0.2s;
+    }
+    .building .count { font-size: 0.72rem; font-weight: bold; color: #aab; }
+    .building .label { font-size: 0.55rem; color: #ccd; }
+    .building.active .icon  { filter: none; transform: scale(1.28); }
+    .building.active .count { color: #2c3e50; }
+    .building.active .label { color: #7f8c8d; }
+
     @keyframes buildingPop {
-      0%   { transform: scale(1.28); }
-      45%  { transform: scale(1.7); }
-      100% { transform: scale(1.28); }
+        0%   { transform: scale(1.28); }
+        45%  { transform: scale(1.7); }
+        100% { transform: scale(1.28); }
     }
-  `}</style>
+    .building.pulse .icon { animation: buildingPop 0.4s ease; }
+
+    .link-btn {
+        background: none; color: #3498db;
+        font-size: 0.82rem; border: none;
+        text-decoration: underline; cursor: pointer;
+        margin-top: 4px;
+    }
+    .hidden { display: none !important; }
+</style>
+```
+
+</head>
+<body>
+<div class="container">
+    <h1>Champion des Tables 🏆</h1>
+
+```
+<!-- SETUP -->
+<div id="setup-screen">
+    <p style="font-size:0.9rem;color:#7f8c8d;margin:8px 0;">Choisis tes tables de travail :</p>
+    <div class="selection-menu">
+        <div class="table-btn" onclick="toggleTable(2)">x 2</div>
+        <div class="table-btn" onclick="toggleTable(3)">x 3</div>
+        <div class="table-btn" onclick="toggleTable(4)">x 4</div>
+        <div class="table-btn" onclick="toggleTable(5)">x 5</div>
+        <div class="table-btn" onclick="toggleTable(6)">x 6</div>
+        <div class="table-btn" onclick="toggleTable(7)">x 7</div>
+        <div class="table-btn" onclick="toggleTable(8)">x 8</div>
+        <div class="table-btn" onclick="toggleTable(9)">x 9</div>
+        <div class="table-btn" onclick="toggleTable(10)">x 10</div>
+    </div>
+    <button class="btn-start" onclick="startGame()" id="start-btn" disabled>Commencer l'entrainement</button>
+    <br>
+    <button class="reset-btn" onclick="resetAll()">Effacer toute la progression</button>
+</div>
+
+<!-- GAME -->
+<div id="game-screen" class="hidden">
+
+    <div id="flashcard" class="card">?</div>
+
+    <div id="answer-display" class="answer-display empty">?</div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="numpad" id="numpad">
+        <div class="num-btn" onclick="numPress(7)">7</div>
+        <div class="num-btn" onclick="numPress(8)">8</div>
+        <div class="num-btn" onclick="numPress(9)">9</div>
+        <div class="num-btn" onclick="numPress(4)">4</div>
+        <div class="num-btn" onclick="numPress(5)">5</div>
+        <div class="num-btn" onclick="numPress(6)">6</div>
+        <div class="num-btn" onclick="numPress(1)">1</div>
+        <div class="num-btn" onclick="numPress(2)">2</div>
+        <div class="num-btn" onclick="numPress(3)">3</div>
+        <div class="num-btn del" onclick="numDel()">⌫</div>
+        <div class="num-btn" onclick="numPress(0)">0</div>
+        <div class="num-btn ok disabled" id="btn-ok" onclick="checkAnswer()">OK</div>
+    </div>
+
+    <div class="buildings">
+        <div class="building" id="bld-1">
+            <div class="icon">🛖</div>
+            <div class="count" id="b1">0</div>
+            <div class="label">Cabane</div>
+        </div>
+        <div class="building" id="bld-2">
+            <div class="icon">🏠</div>
+            <div class="count" id="b2">0</div>
+            <div class="label">Maison</div>
+        </div>
+        <div class="building" id="bld-3">
+            <div class="icon">🏯</div>
+            <div class="count" id="b3">0</div>
+            <div class="label">Manoir</div>
+        </div>
+        <div class="building" id="bld-4">
+            <div class="icon">🏰</div>
+            <div class="count" id="b4">0</div>
+            <div class="label">Chateau</div>
+        </div>
+        <div class="building" id="bld-5">
+            <div class="icon">👑</div>
+            <div class="count" id="b5">0</div>
+            <div class="label">Palais</div>
+        </div>
+    </div>
+
+    <button class="link-btn" onclick="backToMenu()">Changer de tables</button>
 </div>
 ```
 
-);
-}
+</div>
 
-const styles = {
-body: {
-fontFamily: “‘Segoe UI’, sans-serif”,
-background: “#f0f4f8”,
-display: “flex”,
-flexDirection: “column”,
-alignItems: “center”,
-minHeight: “100vh”,
-padding: “12px”,
-},
-container: {
-background: “white”,
-padding: “16px”,
-borderRadius: “20px”,
-boxShadow: “0 10px 25px rgba(0,0,0,0.1)”,
-width: “100%”,
-maxWidth: “420px”,
-textAlign: “center”,
-},
-h1: { color: “#2c3e50”, fontSize: “1.4rem”, marginBottom: “4px” },
-subtitle: { fontSize: “0.9rem”, color: “#7f8c8d”, margin: “8px 0” },
-selectionMenu: {
-display: “grid”,
-gridTemplateColumns: “repeat(3, 1fr)”,
-gap: “8px”,
-margin: “12px 0”,
-padding: “10px”,
-background: “#f8f9fa”,
-borderRadius: “12px”,
-},
-tableBtn: {
-padding: “12px 5px”,
-border: “2px solid #3498db”,
-borderRadius: “10px”,
-cursor: “pointer”,
-background: “white”,
-fontWeight: “bold”,
-fontSize: “0.9rem”,
-},
-tableBtnActive: { background: “#3498db”, color: “white” },
-btnStart: {
-width: “100%”, padding: “15px”,
-fontSize: “1rem”, border: “none”,
-borderRadius: “12px”, cursor: “pointer”,
-fontWeight: “bold”, background: “#3498db”, color: “white”,
-},
-btnStartDisabled: { background: “#bdc3c7”, cursor: “default” },
-resetBtn: {
-background: “none”, color: “#bdc3c7”,
-fontSize: “0.7rem”, border: “none”,
-cursor: “pointer”, marginTop: “16px”,
-},
-gameScreen: { display: “flex”, flexDirection: “column”, gap: “10px” },
-card: {
-width: “100%”, height: “120px”,
-background: “#fff”,
-border: “4px solid #3498db”,
-borderRadius: “15px”,
-display: “flex”,
-justifyContent: “center”,
-alignItems: “center”,
-fontSize: “3.2rem”,
-fontWeight: “bold”,
-},
-cardCorrect: { borderColor: “#2ecc71” },
-cardWrong: { borderColor: “#e74c3c” },
-answerDisplay: {
-width: “100%”, padding: “12px”,
-fontSize: “2.2rem”, fontWeight: “bold”,
-border: “3px solid #3498db”,
-borderRadius: “12px”, textAlign: “center”,
-background: “#f0f7ff”, color: “#2c3e50”,
-minHeight: “62px”, letterSpacing: “2px”,
-},
-answerEmpty: { color: “#bdc3c7” },
-answerCorrect: { borderColor: “#2ecc71”, background: “#eafaf1” },
-answerWrong: { borderColor: “#e74c3c”, background: “#fdf0f0” },
-feedback: {
-minHeight: “48px”,
-display: “flex”, alignItems: “center”,
-justifyContent: “center”,
-flexDirection: “column”, gap: “8px”,
-},
-feedbackMsg: { fontSize: “1rem”, fontWeight: “bold” },
-btnUnderstood: {
-padding: “12px 22px”, fontSize: “0.95rem”,
-border: “none”, borderRadius: “12px”,
-cursor: “pointer”, fontWeight: “bold”,
-background: “#e74c3c”, color: “white”,
-},
-numpad: {
-display: “grid”,
-gridTemplateColumns: “repeat(3, 1fr)”,
-gap: “8px”,
-},
-numBtn: {
-padding: “0”, height: “58px”,
-fontSize: “1.5rem”, fontWeight: “bold”,
-border: “2px solid #dde3ea”,
-borderRadius: “12px”, cursor: “pointer”,
-background: “white”, color: “#2c3e50”,
-display: “flex”, alignItems: “center”,
-justifyContent: “center”,
-},
-numBtnDel: {
-background: “#fef3e8”, borderColor: “#f5cba7”,
-color: “#e67e22”, fontSize: “1.3rem”,
-},
-numBtnOk: {
-background: “#3498db”, borderColor: “#2980b9”,
-color: “white”, fontSize: “1.1rem”,
-},
-numBtnOkDisabled: { background: “#bdc3c7”, borderColor: “#bdc3c7”, cursor: “default” },
-buildings: {
-display: “flex”, justifyContent: “space-around”,
-alignItems: “flex-end”,
-padding: “8px 0 2px 0”,
-borderTop: “2px solid #f0f4f8”,
-},
-building: {
-display: “flex”, flexDirection: “column”,
-alignItems: “center”, gap: “2px”, flex: 1,
-},
-buildingIcon: {
-fontSize: “1.5rem”, lineHeight: 1,
-filter: “grayscale(0.6) opacity(0.45)”,
-transition: “transform 0.2s, filter 0.2s”,
-display: “block”,
-},
-buildingIconActive: { filter: “none”, transform: “scale(1.28)” },
-buildingCount: { fontSize: “0.72rem”, fontWeight: “bold”, color: “#aab” },
-buildingCountActive: { color: “#2c3e50” },
-buildingLabel: { fontSize: “0.55rem”, color: “#ccd” },
-buildingLabelActive: { color: “#7f8c8d” },
-linkBtn: {
-background: “none”, color: “#3498db”,
-fontSize: “0.82rem”, border: “none”,
-textDecoration: “underline”, cursor: “pointer”,
-marginTop: “4px”,
-},
-};
+<script>
+    var deck = JSON.parse(localStorage.getItem('multipliLeitnerV3')) || [];
+    var selectedTables = [];
+    var currentCard = null;
+    var currentInput = '';
+    var inputLocked = false;
+
+    var BOX_WEIGHTS = { 1: 8, 2: 4, 3: 2, 4: 1 };
+
+    /* ── SETUP ── */
+    function toggleTable(n) {
+        var idx = selectedTables.indexOf(n);
+        if (idx > -1) selectedTables.splice(idx, 1);
+        else selectedTables.push(n);
+        renderSelectionButtons();
+        document.getElementById('start-btn').disabled = selectedTables.length === 0;
+    }
+
+    function renderSelectionButtons() {
+        document.querySelectorAll('.table-btn').forEach(function(btn) {
+            var num = parseInt(btn.innerText.replace('x ', ''));
+            btn.classList.toggle('active', selectedTables.includes(num));
+        });
+    }
+
+    function startGame() {
+        selectedTables.forEach(function(t) {
+            for (var i = 1; i <= 10; i++) {
+                if (!deck.find(function(c) { return c.a === t && c.b === i; })) {
+                    deck.push({ a: t, b: i, box: 1 });
+                }
+            }
+        });
+        save();
+        document.getElementById('setup-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        nextQuestion();
+    }
+
+    /* ── NUMPAD ── */
+    function numPress(d) {
+        if (inputLocked) return;
+        if (currentInput.length >= 3) return;
+        currentInput += String(d);
+        updateAnswerDisplay();
+    }
+
+    function numDel() {
+        if (inputLocked) return;
+        currentInput = currentInput.slice(0, -1);
+        updateAnswerDisplay();
+    }
+
+    function updateAnswerDisplay() {
+        var disp = document.getElementById('answer-display');
+        var ok   = document.getElementById('btn-ok');
+        if (currentInput === '') {
+            disp.innerText = '?';
+            disp.className = 'answer-display empty';
+            ok.classList.add('disabled');
+        } else {
+            disp.innerText = currentInput;
+            disp.className = 'answer-display';
+            ok.classList.remove('disabled');
+        }
+    }
+
+    /* ── GAME LOGIC ── */
+    function save() {
+        localStorage.setItem('multipliLeitnerV3', JSON.stringify(deck));
+        updateUI();
+    }
+
+    function updateUI() {
+        var activeDeck = deck.filter(function(c) { return selectedTables.includes(c.a); });
+        for (var i = 1; i <= 5; i++) {
+            var n = activeDeck.filter(function(c) { return c.box === i; }).length;
+            document.getElementById('b' + i).innerText = n;
+        }
+        highlightBuilding(currentCard ? currentCard.box : 0);
+    }
+
+    function highlightBuilding(boxNum) {
+        for (var i = 1; i <= 5; i++) {
+            document.getElementById('bld-' + i).classList.remove('active');
+        }
+        if (boxNum >= 1 && boxNum <= 5) {
+            document.getElementById('bld-' + boxNum).classList.add('active');
+        }
+    }
+
+    function pulseBuilding(boxNum) {
+        var bld = document.getElementById('bld-' + boxNum);
+        if (!bld) return;
+        bld.classList.remove('pulse');
+        void bld.offsetWidth;
+        bld.classList.add('pulse');
+        setTimeout(function() { bld.classList.remove('pulse'); }, 420);
+    }
+
+    function nextQuestion() {
+        var activeDeck = deck.filter(function(c) { return selectedTables.includes(c.a) && c.box < 5; });
+
+        if (activeDeck.length === 0) {
+            document.getElementById('flashcard').innerText = 'FINI ! ✨';
+            document.getElementById('flashcard').style.fontSize = '2.2rem';
+            document.getElementById('flashcard').className = 'card';
+            document.getElementById('feedback').innerHTML = '<p class="feedback-msg correct">Toutes les tables sont au Palais !</p>';
+            document.getElementById('numpad').classList.add('hidden');
+            document.getElementById('answer-display').classList.add('hidden');
+            highlightBuilding(5);
+            return;
+        }
+
+        var weightedPool = [];
+        activeDeck.forEach(function(card) {
+            var w = BOX_WEIGHTS[card.box] || 1;
+            for (var i = 0; i < w; i++) weightedPool.push(card);
+        });
+        currentCard = weightedPool[Math.floor(Math.random() * weightedPool.length)];
+
+        // Reset state
+        inputLocked = false;
+        currentInput = '';
+        var flashcard = document.getElementById('flashcard');
+        flashcard.innerText = currentCard.a + ' x ' + currentCard.b;
+        flashcard.style.fontSize = '3.2rem';
+        flashcard.className = 'card';
+        document.getElementById('feedback').innerHTML = '';
+        document.getElementById('numpad').classList.remove('hidden');
+        document.getElementById('answer-display').classList.remove('hidden');
+        updateAnswerDisplay();
+        updateUI();
+    }
+
+    function checkAnswer() {
+        if (inputLocked) return;
+        if (currentInput === '') return;
+
+        var userAnswer = parseInt(currentInput);
+        var correctAnswer = currentCard.a * currentCard.b;
+        var isCorrect = userAnswer === correctAnswer;
+
+        inputLocked = true;
+
+        var flashcard = document.getElementById('flashcard');
+        var disp = document.getElementById('answer-display');
+        var feedback = document.getElementById('feedback');
+
+        if (isCorrect) {
+            flashcard.classList.add('correct');
+            disp.classList.add('correct');
+            feedback.innerHTML = '<p class="feedback-msg correct">✅ Bravo !</p>';
+
+            var nextBox = Math.min(currentCard.box + 1, 5);
+            flashcard.classList.add('anim-fly-right');
+            setTimeout(function() {
+                currentCard.box = nextBox;
+                save();
+                pulseBuilding(nextBox);
+                setTimeout(nextQuestion, 430);
+            }, 430);
+
+        } else {
+            flashcard.classList.add('wrong');
+            disp.classList.add('wrong');
+            flashcard.classList.add('anim-shake');
+
+            setTimeout(function() {
+                flashcard.classList.remove('anim-shake');
+                feedback.innerHTML = '<p class="feedback-msg wrong">❌ Faux ! C\'etait <strong>' + correctAnswer + '</strong></p><button class="btn-understood" onclick="handleWrong()">C\'est compris</button>';
+            }, 460);
+        }
+    }
+
+    function handleWrong() {
+        var flashcard = document.getElementById('flashcard');
+        flashcard.classList.add('anim-fly-left');
+        setTimeout(function() {
+            currentCard.box = 1;
+            save();
+            pulseBuilding(1);
+            setTimeout(nextQuestion, 430);
+        }, 430);
+    }
+
+    function backToMenu() {
+        document.getElementById('setup-screen').classList.remove('hidden');
+        document.getElementById('game-screen').classList.add('hidden');
+    }
+
+    function resetAll() {
+        if (confirm('Veux-tu vraiment recommencer a zero ?')) {
+            localStorage.removeItem('multipliLeitnerV3');
+            deck = [];
+            selectedTables = [];
+            currentCard = null;
+            renderSelectionButtons();
+            document.getElementById('start-btn').disabled = true;
+        }
+    }
+</script>
+
+</body>
+</html>
