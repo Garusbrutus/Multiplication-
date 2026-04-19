@@ -300,7 +300,7 @@
         <div class="table-btn" onclick="toggleTable(10)">x 10</div>
     </div>
     <div class="setup-footer">
-        <button class="btn-start" onclick="startGame()" id="start-btn" disabled>Commencer l'entrainement</button>
+        <button class="btn-start" onclick="startGame()" id="start-btn" disabled>Commencer l entrainement</button>
         <button class="reset-btn" onclick="resetAll()">Effacer toute la progression</button>
     </div>
 </div>
@@ -529,7 +529,7 @@
             flashcard.classList.add('anim-shake');
             setTimeout(function() {
                 flashcard.classList.remove('anim-shake');
-                feedback.innerHTML = '<p class="feedback-msg wrong">❌ Faux ! C\'etait <strong>' + correctAnswer + '</strong></p><button class="btn-understood" onclick="handleWrong()">C\'est compris</button>';
+                feedback.innerHTML = '<p class="feedback-msg wrong">❌ Faux ! C etait <strong>' + correctAnswer + '</strong></p><button class="btn-understood" onclick="handleWrong()">OK compris</button>';
             }, 460);
         }
     }
