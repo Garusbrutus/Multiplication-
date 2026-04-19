@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -8,79 +9,137 @@
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8; display: flex; flex-direction: column; align-items: center; padding: 15px; touch-action: manipulation; }
         .container { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; box-sizing: border-box; }
         h1 { color: #2c3e50; font-size: 1.4rem; margin-top: 0; }
-        
-        /* Menu de sélection - Grille de 3 colonnes */
-        .selection-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 12px; }
-        .table-btn { padding: 12px 5px; border: 2px solid #3498db; border-radius: 10px; cursor: pointer; background: white; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
-        .table-btn.active { background: #3498db; color: white; border-color: #2980b9; }
 
-        .card { width: 100%; height: 160px; background: #fff; border: 4px solid #3498db; border-radius: 15px; display: flex; justify-content: center; align-items: center; font-size: 3.5rem; font-weight: bold; margin: 15px 0; box-sizing: border-box; }
-        
-        .controls { display: flex; gap: 10px; justify-content: center; min-height: 60px; }
-        button { padding: 15px 10px; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; flex: 1; -webkit-tap-highlight-color: transparent; }
-        .btn-check { background: #3498db; color: white; }
-        .btn-correct { background: #2ecc71; color: white; }
-        .btn-wrong { background: #e74c3c; color: white; }
-        
-        .compartments { margin-top: 20px; display: flex; gap: 4px; }
-        .box { background: #ecf0f1; padding: 6px 2px; border-radius: 6px; flex: 1; font-size: 0.65rem; min-width: 0; }
-        .box h4 { margin: 0 0 2px 0; color: #34495e; font-size: 0.7rem; }
-        .hidden { display: none !important; }
-        .instructions { font-size: 0.9rem; color: #7f8c8d; margin-bottom: 5px; }
-    </style>
+```
+    .selection-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 12px; }
+    .table-btn { padding: 12px 5px; border: 2px solid #3498db; border-radius: 10px; cursor: pointer; background: white; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
+    .table-btn.active { background: #3498db; color: white; border-color: #2980b9; }
+
+    .card { width: 100%; height: 140px; background: #fff; border: 4px solid #3498db; border-radius: 15px; display: flex; justify-content: center; align-items: center; font-size: 3.5rem; font-weight: bold; margin: 15px 0; box-sizing: border-box; transition: border-color 0.3s; }
+    .card.correct { border-color: #2ecc71; }
+    .card.wrong { border-color: #e74c3c; }
+
+    .input-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 12px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    #answer-input {
+        flex: 1;
+        min-width: 0;
+        padding: 14px 10px;
+        font-size: 2rem;
+        font-weight: bold;
+        border: 3px solid #3498db;
+        border-radius: 12px;
+        text-align: center;
+        outline: none;
+        background: #f0f7ff;
+        color: #2c3e50;
+        box-sizing: border-box;
+    }
+    #answer-input:focus { border-color: #2980b9; background: #e8f4fd; }
+    #answer-input:disabled { background: #f8f9fa; color: #7f8c8d; border-color: #bdc3c7; }
+
+    #btn-validate {
+        flex: 0 0 70px;
+        padding: 14px 10px;
+        font-size: 1.1rem;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: bold;
+        background: #3498db;
+        color: white;
+        -webkit-tap-highlight-color: transparent;
+        box-sizing: border-box;
+    }
+    #btn-validate:disabled { background: #bdc3c7; cursor: default; }
+
+    .feedback { min-height: 60px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; }
+    .feedback-msg { font-size: 1.1rem; font-weight: bold; }
+    .feedback-msg.correct { color: #2ecc71; }
+    .feedback-msg.wrong { color: #e74c3c; }
+
+    .btn-understood { padding: 14px 24px; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; background: #e74c3c; color: white; -webkit-tap-highlight-color: transparent; }
+
+    .compartments { margin-top: 20px; display: flex; gap: 4px; }
+    .box { background: #ecf0f1; padding: 6px 2px; border-radius: 6px; flex: 1; font-size: 0.65rem; min-width: 0; }
+    .box h4 { margin: 0 0 2px 0; color: #34495e; font-size: 0.7rem; }
+    .hidden { display: none !important; }
+    .instructions { font-size: 0.9rem; color: #7f8c8d; margin-bottom: 5px; }
+
+    button.link-btn { background: none; color: #3498db; font-size: 0.85rem; border: none; text-decoration: underline; cursor: pointer; margin-top: 20px; }
+    button.reset-btn { background: none; color: #bdc3c7; font-size: 0.7rem; border: none; cursor: pointer; margin-top: 20px; }
+    .btn-start { width: 100%; padding: 15px; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; background: #3498db; color: white; }
+    .btn-start:disabled { background: #bdc3c7; cursor: default; }
+</style>
+```
+
 </head>
 <body>
 
 <div class="container">
     <h1>Champion des Tables 🏆</h1>
-    
-    <div id="setup-screen">
-        <p class="instructions">Choisis tes tables de travail :</p>
-        <div class="selection-menu">
-            <div class="table-btn" onclick="toggleTable(2)">x 2</div>
-            <div class="table-btn" onclick="toggleTable(3)">x 3</div>
-            <div class="table-btn" onclick="toggleTable(4)">x 4</div>
-            <div class="table-btn" onclick="toggleTable(5)">x 5</div>
-            <div class="table-btn" onclick="toggleTable(6)">x 6</div>
-            <div class="table-btn" onclick="toggleTable(7)">x 7</div>
-            <div class="table-btn" onclick="toggleTable(8)">x 8</div>
-            <div class="table-btn" onclick="toggleTable(9)">x 9</div>
-            <div class="table-btn" onclick="toggleTable(10)">x 10</div>
-        </div>
-        <button class="btn-check" onclick="startGame()" id="start-btn" disabled style="width:100%">Commencer l'entraînement</button>
-        <button onclick="resetAll()" style="margin-top:20px; background:none; color:#bdc3c7; font-size:0.7rem; border:none;">Effacer toute la progression</button>
+
+```
+<div id="setup-screen">
+    <p class="instructions">Choisis tes tables de travail :</p>
+    <div class="selection-menu">
+        <div class="table-btn" onclick="toggleTable(2)">x 2</div>
+        <div class="table-btn" onclick="toggleTable(3)">x 3</div>
+        <div class="table-btn" onclick="toggleTable(4)">x 4</div>
+        <div class="table-btn" onclick="toggleTable(5)">x 5</div>
+        <div class="table-btn" onclick="toggleTable(6)">x 6</div>
+        <div class="table-btn" onclick="toggleTable(7)">x 7</div>
+        <div class="table-btn" onclick="toggleTable(8)">x 8</div>
+        <div class="table-btn" onclick="toggleTable(9)">x 9</div>
+        <div class="table-btn" onclick="toggleTable(10)">x 10</div>
+    </div>
+    <button class="btn-start" onclick="startGame()" id="start-btn" disabled>Commencer l'entraînement</button>
+    <br>
+    <button class="reset-btn" onclick="resetAll()">Effacer toute la progression</button>
+</div>
+
+<div id="game-screen" class="hidden">
+    <div id="flashcard" class="card">?</div>
+
+    <div class="input-row">
+        <input id="answer-input" type="number" inputmode="numeric" placeholder="?" autocomplete="off" />
+        <button id="btn-validate" onclick="checkAnswer()">OK</button>
     </div>
 
-    <div id="game-screen" class="hidden">
-        <div id="flashcard" class="card">?</div>
-        <p id="hint" class="instructions">Cherche la réponse dans ta tête...</p>
-        <div class="controls">
-            <button id="btn-show" class="btn-check">Vérifier</button>
-            <button id="btn-wrong" class="btn-wrong hidden">Faux ❌</button>
-            <button id="btn-correct" class="btn-correct hidden">Juste ✅</button>
-        </div>
-        <div class="compartments">
-            <div class="box"><h4>B1</h4><span id="b1">0</span></div>
-            <div class="box"><h4>B2</h4><span id="b2">0</span></div>
-            <div class="box"><h4>B3</h4><span id="b3">0</span></div>
-            <div class="box"><h4>B4</h4><span id="b4">0</span></div>
-            <div class="box"><h4>B5</h4><span id="b5">0</span></div>
-        </div>
-        <button onclick="backToMenu()" style="margin-top:20px; background:none; color:#3498db; font-size:0.85rem; border:none; text-decoration:underline;">Changer de tables</button>
+    <div class="feedback" id="feedback">
+        <p class="instructions">Tape ta réponse et appuie sur OK</p>
     </div>
+
+    <div class="compartments">
+        <div class="box"><h4>B1</h4><span id="b1">0</span></div>
+        <div class="box"><h4>B2</h4><span id="b2">0</span></div>
+        <div class="box"><h4>B3</h4><span id="b3">0</span></div>
+        <div class="box"><h4>B4</h4><span id="b4">0</span></div>
+        <div class="box"><h4>B5</h4><span id="b5">0</span></div>
+    </div>
+
+    <button class="link-btn" onclick="backToMenu()">Changer de tables</button>
+</div>
+```
+
 </div>
 
 <script>
-    // Chargement des données (v3 pour éviter les conflits avec les tests précédents)
     let deck = JSON.parse(localStorage.getItem('multipliLeitnerV3')) || [];
     let selectedTables = [];
     let currentCard = null;
+
+    const BOX_WEIGHTS = { 1: 8, 2: 4, 3: 2, 4: 1 };
 
     function toggleTable(n) {
         const idx = selectedTables.indexOf(n);
         if (idx > -1) selectedTables.splice(idx, 1);
         else selectedTables.push(n);
-        
         renderSelectionButtons();
         document.getElementById('start-btn').disabled = selectedTables.length === 0;
     }
@@ -88,16 +147,11 @@
     function renderSelectionButtons() {
         document.querySelectorAll('.table-btn').forEach(btn => {
             const num = parseInt(btn.innerText.replace('x ', ''));
-            if (selectedTables.includes(num)) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
+            btn.classList.toggle('active', selectedTables.includes(num));
         });
     }
 
     function startGame() {
-        // Initialisation des fiches pour TOUTES les tables sélectionnées
         selectedTables.forEach(t => {
             for (let i = 1; i <= 10; i++) {
                 if (!deck.find(c => c.a === t && c.b === i)) {
@@ -125,50 +179,77 @@
 
     function nextQuestion() {
         const activeDeck = deck.filter(c => selectedTables.includes(c.a) && c.box < 5);
-        
+
         if (activeDeck.length === 0) {
             document.getElementById('flashcard').innerText = "FINI ! ✨";
             document.getElementById('flashcard').style.fontSize = "2.5rem";
-            document.getElementById('hint').innerText = "Toutes les tables choisies sont en Boîte 5 !";
-            document.getElementById('btn-show').classList.add('hidden');
+            document.getElementById('flashcard').className = 'card';
+            document.getElementById('feedback').innerHTML = '<p class="instructions">Toutes les tables choisies sont en Boîte 5 !</p>';
+            document.getElementById('answer-input').classList.add('hidden');
+            document.getElementById('btn-validate').classList.add('hidden');
             return;
         }
 
-        // Priorité aux cartes de la boîte 1 (B1)
-        const b1 = activeDeck.filter(c => c.box === 1);
-        if (b1.length > 0 && Math.random() > 0.4) {
-            currentCard = b1[Math.floor(Math.random() * b1.length)];
-        } else {
-            currentCard = activeDeck[Math.floor(Math.random() * activeDeck.length)];
-        }
+        const weightedPool = [];
+        activeDeck.forEach(card => {
+            const weight = BOX_WEIGHTS[card.box] || 1;
+            for (let i = 0; i < weight; i++) weightedPool.push(card);
+        });
+        currentCard = weightedPool[Math.floor(Math.random() * weightedPool.length)];
 
-        document.getElementById('flashcard').innerText = `${currentCard.a} x ${currentCard.b}`;
-        document.getElementById('flashcard').style.fontSize = "3.5rem";
-        document.getElementById('hint').innerText = "Cherche la réponse dans ta tête...";
-        document.getElementById('btn-show').classList.remove('hidden');
-        document.getElementById('btn-wrong').classList.add('hidden');
-        document.getElementById('btn-correct').classList.add('hidden');
+        const input = document.getElementById('answer-input');
+        const flashcard = document.getElementById('flashcard');
+        flashcard.innerText = `${currentCard.a} × ${currentCard.b}`;
+        flashcard.style.fontSize = "3.5rem";
+        flashcard.className = 'card';
+        input.value = '';
+        input.disabled = false;
+        input.classList.remove('hidden');
+        document.getElementById('btn-validate').disabled = false;
+        document.getElementById('btn-validate').classList.remove('hidden');
+        document.getElementById('feedback').innerHTML = '<p class="instructions">Tape ta réponse et appuie sur OK</p>';
+
+        setTimeout(() => input.focus(), 100);
     }
 
-    document.getElementById('btn-show').onclick = () => {
-        document.getElementById('flashcard').innerText = currentCard.a * currentCard.b;
-        document.getElementById('hint').innerText = "Alors, c'était juste ?";
-        document.getElementById('btn-show').classList.add('hidden');
-        document.getElementById('btn-wrong').classList.remove('hidden');
-        document.getElementById('btn-correct').classList.remove('hidden');
-    };
+    function checkAnswer() {
+        const input = document.getElementById('answer-input');
+        const userAnswer = parseInt(input.value);
+        if (isNaN(userAnswer)) return;
 
-    document.getElementById('btn-correct').onclick = () => {
-        if (currentCard.box < 5) currentCard.box++;
+        const correctAnswer = currentCard.a * currentCard.b;
+        const isCorrect = userAnswer === correctAnswer;
+
+        input.disabled = true;
+        document.getElementById('btn-validate').disabled = true;
+
+        const flashcard = document.getElementById('flashcard');
+        const feedback = document.getElementById('feedback');
+
+        if (isCorrect) {
+            flashcard.classList.add('correct');
+            feedback.innerHTML = '<p class="feedback-msg correct">✅ Bravo !</p>';
+            if (currentCard.box < 5) currentCard.box++;
+            save();
+            setTimeout(nextQuestion, 1000);
+        } else {
+            flashcard.classList.add('wrong');
+            feedback.innerHTML = `
+                <p class="feedback-msg wrong">❌ Faux ! La bonne réponse était <strong>${correctAnswer}</strong></p>
+                <button class="btn-understood" onclick="handleWrong()">C'est compris</button>
+            `;
+        }
+    }
+
+    function handleWrong() {
+        currentCard.box = 1;
         save();
         nextQuestion();
-    };
+    }
 
-    document.getElementById('btn-wrong').onclick = () => {
-        currentCard.box = 1; // Sanction Leitner : retour au début
-        save();
-        nextQuestion();
-    };
+    document.getElementById('answer-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') checkAnswer();
+    });
 
     function backToMenu() {
         document.getElementById('setup-screen').classList.remove('hidden');
@@ -176,15 +257,15 @@
     }
 
     function resetAll() {
-        if(confirm("Veux-tu vraiment recommencer à zéro et effacer toutes les boîtes ?")) {
+        if (confirm("Veux-tu vraiment recommencer à zéro et effacer toutes les boîtes ?")) {
             localStorage.removeItem('multipliLeitnerV3');
             deck = [];
             selectedTables = [];
             renderSelectionButtons();
             document.getElementById('start-btn').disabled = true;
-            updateUI();
         }
     }
 </script>
+
 </body>
 </html>
