@@ -11,42 +11,71 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
 ```
-    body {
-        font-family: 'Segoe UI', sans-serif;
+    html, body {
+        height: 100%;
+        height: 100dvh;
+        overflow: hidden;
         background: #f0f4f8;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100vh;
-        padding: 12px;
-        touch-action: manipulation;
+        font-family: 'Segoe UI', sans-serif;
         -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+
+    /* Plein écran, centré */
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
     }
 
     .container {
         background: white;
-        padding: 16px;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         width: 100%;
         max-width: 420px;
-        text-align: center;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        height: 100dvh;
+        padding: 12px 14px;
+        overflow: hidden;
     }
 
-    h1 { color: #2c3e50; font-size: 1.4rem; margin-bottom: 4px; }
+    h1 {
+        color: #2c3e50;
+        font-size: 1.3rem;
+        text-align: center;
+        flex-shrink: 0;
+        padding-bottom: 6px;
+    }
 
     /* ── SETUP ── */
+    #setup-screen {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    #setup-screen p {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+        text-align: center;
+        margin-bottom: 8px;
+        flex-shrink: 0;
+    }
+
     .selection-menu {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-        margin: 12px 0;
-        padding: 10px;
+        gap: 6px;
+        padding: 8px;
         background: #f8f9fa;
         border-radius: 12px;
+        flex-shrink: 0;
     }
+
     .table-btn {
-        padding: 12px 5px;
+        padding: 10px 5px;
         border: 2px solid #3498db;
         border-radius: 10px;
         cursor: pointer;
@@ -54,10 +83,22 @@
         font-weight: bold;
         font-size: 0.9rem;
         transition: 0.2s;
+        text-align: center;
     }
     .table-btn.active { background: #3498db; color: white; }
+
+    .setup-footer {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding-top: 10px;
+        flex-shrink: 0;
+    }
+
     .btn-start {
-        width: 100%; padding: 15px;
+        width: 100%; padding: 14px;
         font-size: 1rem; border: none;
         border-radius: 12px; cursor: pointer;
         font-weight: bold; background: #3498db; color: white;
@@ -65,27 +106,34 @@
     .btn-start:disabled { background: #bdc3c7; cursor: default; }
     .reset-btn {
         background: none; color: #bdc3c7;
-        font-size: 0.7rem; border: none;
-        cursor: pointer; margin-top: 16px;
+        font-size: 0.7rem; border: none; cursor: pointer;
     }
 
     /* ── GAME ── */
-    #game-screen { display: flex; flex-direction: column; gap: 10px; }
+    #game-screen {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        gap: 0;
+        overflow: hidden;
+    }
 
-    /* Flashcard */
+    /* Flashcard — taille flexible */
     .card {
         width: 100%;
-        height: 120px;
+        flex: 0 0 auto;
+        min-height: 90px;
+        max-height: 130px;
         background: #fff;
         border: 4px solid #3498db;
-        border-radius: 15px;
+        border-radius: 14px;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 3.2rem;
+        font-size: clamp(2rem, 8vw, 3.2rem);
         font-weight: bold;
+        margin: 6px 0;
         transition: border-color 0.3s;
-        position: relative;
         overflow: visible;
     }
     .card.correct { border-color: #2ecc71; }
@@ -93,18 +141,18 @@
 
     @keyframes shake {
         0%,100% { transform: translateX(0); }
-        20%      { transform: translateX(-10px); }
-        40%      { transform: translateX(10px); }
-        60%      { transform: translateX(-6px); }
-        80%      { transform: translateX(6px); }
+        20%  { transform: translateX(-10px); }
+        40%  { transform: translateX(10px); }
+        60%  { transform: translateX(-6px); }
+        80%  { transform: translateX(6px); }
     }
     @keyframes flyRight {
         0%   { transform: scale(1) translate(0,0); opacity: 1; }
-        100% { transform: scale(0.12) translate(200px, 100px); opacity: 0; }
+        100% { transform: scale(0.12) translate(200px, 80px); opacity: 0; }
     }
     @keyframes flyLeft {
         0%   { transform: scale(1) translate(0,0); opacity: 1; }
-        100% { transform: scale(0.12) translate(-200px, 100px); opacity: 0; }
+        100% { transform: scale(0.12) translate(-200px, 80px); opacity: 0; }
     }
     .card.anim-shake     { animation: shake 0.45s ease; }
     .card.anim-fly-right { animation: flyRight 0.45s ease forwards; }
@@ -113,50 +161,53 @@
     /* Answer display */
     .answer-display {
         width: 100%;
-        padding: 12px;
-        font-size: 2.2rem;
+        flex-shrink: 0;
+        padding: 8px;
+        font-size: clamp(1.4rem, 6vw, 2rem);
         font-weight: bold;
         border: 3px solid #3498db;
         border-radius: 12px;
         text-align: center;
         background: #f0f7ff;
         color: #2c3e50;
-        min-height: 62px;
         letter-spacing: 2px;
+        margin-bottom: 4px;
     }
-    .answer-display.empty { color: #bdc3c7; }
+    .answer-display.empty   { color: #bdc3c7; }
     .answer-display.correct { border-color: #2ecc71; background: #eafaf1; }
     .answer-display.wrong   { border-color: #e74c3c; background: #fdf0f0; }
 
     /* Feedback */
     .feedback {
-        min-height: 48px;
+        flex-shrink: 0;
+        min-height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
-        gap: 8px;
+        gap: 6px;
+        margin-bottom: 4px;
     }
-    .feedback-msg { font-size: 1rem; font-weight: bold; }
+    .feedback-msg { font-size: 0.95rem; font-weight: bold; }
     .feedback-msg.correct { color: #2ecc71; }
     .feedback-msg.wrong   { color: #e74c3c; }
     .btn-understood {
-        padding: 12px 22px; font-size: 0.95rem;
+        padding: 10px 20px; font-size: 0.9rem;
         border: none; border-radius: 12px;
         cursor: pointer; font-weight: bold;
         background: #e74c3c; color: white;
     }
 
-    /* Numpad */
+    /* Numpad — prend l'espace restant */
     .numpad {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
+        gap: 6px;
+        flex: 1;
+        min-height: 0;
     }
     .num-btn {
-        padding: 0;
-        height: 58px;
-        font-size: 1.5rem;
+        font-size: clamp(1.1rem, 5vw, 1.5rem);
         font-weight: bold;
         border: 2px solid #dde3ea;
         border-radius: 12px;
@@ -168,54 +219,62 @@
         justify-content: center;
         transition: background 0.1s, transform 0.1s;
         user-select: none;
+        min-height: 0;
     }
-    .num-btn:active { background: #eaf2fb; transform: scale(0.94); }
-    .num-btn.del { background: #fef3e8; border-color: #f5cba7; color: #e67e22; font-size: 1.3rem; }
+    .num-btn:active { background: #eaf2fb; transform: scale(0.93); }
+    .num-btn.del { background: #fef3e8; border-color: #f5cba7; color: #e67e22; }
     .num-btn.del:active { background: #fde8cc; }
-    .num-btn.ok  { background: #3498db; border-color: #2980b9; color: white; font-size: 1.1rem; }
+    .num-btn.ok  { background: #3498db; border-color: #2980b9; color: white; }
     .num-btn.ok:active  { background: #2980b9; }
     .num-btn.ok.disabled { background: #bdc3c7; border-color: #bdc3c7; cursor: default; }
 
     /* Buildings */
     .buildings {
+        flex-shrink: 0;
         display: flex;
         justify-content: space-around;
         align-items: flex-end;
-        padding: 8px 0 2px 0;
+        padding: 6px 0 2px 0;
         border-top: 2px solid #f0f4f8;
+        margin-top: 6px;
     }
     .building {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 2px;
+        gap: 1px;
         flex: 1;
     }
     .building .icon {
-        font-size: 1.5rem;
+        font-size: clamp(1.2rem, 5vw, 1.6rem);
         line-height: 1;
-        filter: grayscale(0.6) opacity(0.45);
+        filter: grayscale(0.6) opacity(0.4);
         transition: transform 0.2s, filter 0.2s;
     }
-    .building .count { font-size: 0.72rem; font-weight: bold; color: #aab; }
-    .building .label { font-size: 0.55rem; color: #ccd; }
-    .building.active .icon  { filter: none; transform: scale(1.28); }
+    .building .count { font-size: 0.68rem; font-weight: bold; color: #aab; }
+    .building .label { font-size: 0.52rem; color: #ccd; }
+    .building.active .icon  { filter: none; transform: scale(1.25); }
     .building.active .count { color: #2c3e50; }
     .building.active .label { color: #7f8c8d; }
 
     @keyframes buildingPop {
-        0%   { transform: scale(1.28); }
-        45%  { transform: scale(1.7); }
-        100% { transform: scale(1.28); }
+        0%   { transform: scale(1.25); }
+        45%  { transform: scale(1.65); }
+        100% { transform: scale(1.25); }
     }
     .building.pulse .icon { animation: buildingPop 0.4s ease; }
 
+    .game-footer {
+        flex-shrink: 0;
+        text-align: center;
+        padding-top: 4px;
+    }
     .link-btn {
         background: none; color: #3498db;
-        font-size: 0.82rem; border: none;
+        font-size: 0.78rem; border: none;
         text-decoration: underline; cursor: pointer;
-        margin-top: 4px;
     }
+
     .hidden { display: none !important; }
 </style>
 ```
@@ -228,7 +287,7 @@
 ```
 <!-- SETUP -->
 <div id="setup-screen">
-    <p style="font-size:0.9rem;color:#7f8c8d;margin:8px 0;">Choisis tes tables de travail :</p>
+    <p>Choisis tes tables de travail :</p>
     <div class="selection-menu">
         <div class="table-btn" onclick="toggleTable(2)">x 2</div>
         <div class="table-btn" onclick="toggleTable(3)">x 3</div>
@@ -240,9 +299,10 @@
         <div class="table-btn" onclick="toggleTable(9)">x 9</div>
         <div class="table-btn" onclick="toggleTable(10)">x 10</div>
     </div>
-    <button class="btn-start" onclick="startGame()" id="start-btn" disabled>Commencer l'entrainement</button>
-    <br>
-    <button class="reset-btn" onclick="resetAll()">Effacer toute la progression</button>
+    <div class="setup-footer">
+        <button class="btn-start" onclick="startGame()" id="start-btn" disabled>Commencer l'entrainement</button>
+        <button class="reset-btn" onclick="resetAll()">Effacer toute la progression</button>
+    </div>
 </div>
 
 <!-- GAME -->
@@ -297,7 +357,9 @@
         </div>
     </div>
 
-    <button class="link-btn" onclick="backToMenu()">Changer de tables</button>
+    <div class="game-footer">
+        <button class="link-btn" onclick="backToMenu()">Changer de tables</button>
+    </div>
 </div>
 ```
 
@@ -312,7 +374,6 @@
 
     var BOX_WEIGHTS = { 1: 8, 2: 4, 3: 2, 4: 1 };
 
-    /* ── SETUP ── */
     function toggleTable(n) {
         var idx = selectedTables.indexOf(n);
         if (idx > -1) selectedTables.splice(idx, 1);
@@ -342,7 +403,6 @@
         nextQuestion();
     }
 
-    /* ── NUMPAD ── */
     function numPress(d) {
         if (inputLocked) return;
         if (currentInput.length >= 3) return;
@@ -370,7 +430,6 @@
         }
     }
 
-    /* ── GAME LOGIC ── */
     function save() {
         localStorage.setItem('multipliLeitnerV3', JSON.stringify(deck));
         updateUI();
@@ -408,7 +467,7 @@
 
         if (activeDeck.length === 0) {
             document.getElementById('flashcard').innerText = 'FINI ! ✨';
-            document.getElementById('flashcard').style.fontSize = '2.2rem';
+            document.getElementById('flashcard').style.fontSize = '2rem';
             document.getElementById('flashcard').className = 'card';
             document.getElementById('feedback').innerHTML = '<p class="feedback-msg correct">Toutes les tables sont au Palais !</p>';
             document.getElementById('numpad').classList.add('hidden');
@@ -424,12 +483,11 @@
         });
         currentCard = weightedPool[Math.floor(Math.random() * weightedPool.length)];
 
-        // Reset state
         inputLocked = false;
         currentInput = '';
         var flashcard = document.getElementById('flashcard');
         flashcard.innerText = currentCard.a + ' x ' + currentCard.b;
-        flashcard.style.fontSize = '3.2rem';
+        flashcard.style.fontSize = '';
         flashcard.className = 'card';
         document.getElementById('feedback').innerHTML = '';
         document.getElementById('numpad').classList.remove('hidden');
@@ -456,7 +514,6 @@
             flashcard.classList.add('correct');
             disp.classList.add('correct');
             feedback.innerHTML = '<p class="feedback-msg correct">✅ Bravo !</p>';
-
             var nextBox = Math.min(currentCard.box + 1, 5);
             flashcard.classList.add('anim-fly-right');
             setTimeout(function() {
@@ -470,7 +527,6 @@
             flashcard.classList.add('wrong');
             disp.classList.add('wrong');
             flashcard.classList.add('anim-shake');
-
             setTimeout(function() {
                 flashcard.classList.remove('anim-shake');
                 feedback.innerHTML = '<p class="feedback-msg wrong">❌ Faux ! C\'etait <strong>' + correctAnswer + '</strong></p><button class="btn-understood" onclick="handleWrong()">C\'est compris</button>';
@@ -492,6 +548,7 @@
     function backToMenu() {
         document.getElementById('setup-screen').classList.remove('hidden');
         document.getElementById('game-screen').classList.add('hidden');
+        currentCard = null;
     }
 
     function resetAll() {
