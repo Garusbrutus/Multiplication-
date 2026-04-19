@@ -1,271 +1,504 @@
-<!DOCTYPE html>
+import { useState, useCallback } from “react”;
 
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Multipli-Leitner Total</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8; display: flex; flex-direction: column; align-items: center; padding: 15px; touch-action: manipulation; }
-        .container { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; box-sizing: border-box; }
-        h1 { color: #2c3e50; font-size: 1.4rem; margin-top: 0; }
+const BOX_WEIGHTS = { 1: 8, 2: 4, 3: 2, 4: 1 };
 
-```
-    .selection-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 12px; }
-    .table-btn { padding: 12px 5px; border: 2px solid #3498db; border-radius: 10px; cursor: pointer; background: white; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
-    .table-btn.active { background: #3498db; color: white; border-color: #2980b9; }
+function buildInitialDeck(selectedTables, existingDeck) {
+const deck = […existingDeck];
+selectedTables.forEach((t) => {
+for (let i = 1; i <= 10; i++) {
+if (!deck.find((c) => c.a === t && c.b === i)) {
+deck.push({ a: t, b: i, box: 1 });
+}
+}
+});
+return deck;
+}
 
-    .card { width: 100%; height: 140px; background: #fff; border: 4px solid #3498db; border-radius: 15px; display: flex; justify-content: center; align-items: center; font-size: 3.5rem; font-weight: bold; margin: 15px 0; box-sizing: border-box; transition: border-color 0.3s; }
-    .card.correct { border-color: #2ecc71; }
-    .card.wrong { border-color: #e74c3c; }
+function pickCard(deck, selectedTables) {
+const activeDeck = deck.filter((c) => selectedTables.includes(c.a) && c.box < 5);
+if (activeDeck.length === 0) return null;
+const pool = [];
+activeDeck.forEach((card) => {
+const w = BOX_WEIGHTS[card.box] || 1;
+for (let i = 0; i < w; i++) pool.push(card);
+});
+return pool[Math.floor(Math.random() * pool.length)];
+}
 
-    .input-row {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 12px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    #answer-input {
-        flex: 1;
-        min-width: 0;
-        padding: 14px 10px;
-        font-size: 2rem;
-        font-weight: bold;
-        border: 3px solid #3498db;
-        border-radius: 12px;
-        text-align: center;
-        outline: none;
-        background: #f0f7ff;
-        color: #2c3e50;
-        box-sizing: border-box;
-    }
-    #answer-input:focus { border-color: #2980b9; background: #e8f4fd; }
-    #answer-input:disabled { background: #f8f9fa; color: #7f8c8d; border-color: #bdc3c7; }
+export default function App() {
+const [screen, setScreen] = useState(“setup”); // setup | game | done
+const [selectedTables, setSelectedTables] = useState([]);
+const [deck, setDeck] = useState([]);
+const [currentCard, setCurrentCard] = useState(null);
+const [input, setInput] = useState(””);
+const [locked, setLocked] = useState(false);
+const [cardState, setCardState] = useState(””); // correct | wrong | “”
+const [animCard, setAnimCard] = useState(””); // fly-right | fly-left | shake
+const [feedback, setFeedback] = useState(null); // null | { type, correct }
+const [pulseBox, setPulseBox] = useState(null);
 
-    #btn-validate {
-        flex: 0 0 70px;
-        padding: 14px 10px;
-        font-size: 1.1rem;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        font-weight: bold;
-        background: #3498db;
-        color: white;
-        -webkit-tap-highlight-color: transparent;
-        box-sizing: border-box;
-    }
-    #btn-validate:disabled { background: #bdc3c7; cursor: default; }
+const toggleTable = (n) => {
+setSelectedTables((prev) =>
+prev.includes(n) ? prev.filter((x) => x !== n) : […prev, n]
+);
+};
 
-    .feedback { min-height: 60px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; }
-    .feedback-msg { font-size: 1.1rem; font-weight: bold; }
-    .feedback-msg.correct { color: #2ecc71; }
-    .feedback-msg.wrong { color: #e74c3c; }
+const startGame = () => {
+const newDeck = buildInitialDeck(selectedTables, deck);
+setDeck(newDeck);
+const card = pickCard(newDeck, selectedTables);
+setCurrentCard(card);
+setInput(””);
+setLocked(false);
+setCardState(””);
+setAnimCard(””);
+setFeedback(null);
+setScreen(card ? “game” : “done”);
+};
 
-    .btn-understood { padding: 14px 24px; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; background: #e74c3c; color: white; -webkit-tap-highlight-color: transparent; }
+const boxCounts = (d, sel) => {
+const active = d.filter((c) => sel.includes(c.a));
+const counts = {};
+for (let i = 1; i <= 5; i++) counts[i] = active.filter((c) => c.box === i).length;
+return counts;
+};
 
-    .compartments { margin-top: 20px; display: flex; gap: 4px; }
-    .box { background: #ecf0f1; padding: 6px 2px; border-radius: 6px; flex: 1; font-size: 0.65rem; min-width: 0; }
-    .box h4 { margin: 0 0 2px 0; color: #34495e; font-size: 0.7rem; }
-    .hidden { display: none !important; }
-    .instructions { font-size: 0.9rem; color: #7f8c8d; margin-bottom: 5px; }
+const numPress = (d) => {
+if (locked) return;
+if (input.length >= 3) return;
+setInput((prev) => prev + String(d));
+};
 
-    button.link-btn { background: none; color: #3498db; font-size: 0.85rem; border: none; text-decoration: underline; cursor: pointer; margin-top: 20px; }
-    button.reset-btn { background: none; color: #bdc3c7; font-size: 0.7rem; border: none; cursor: pointer; margin-top: 20px; }
-    .btn-start { width: 100%; padding: 15px; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; background: #3498db; color: white; }
-    .btn-start:disabled { background: #bdc3c7; cursor: default; }
-</style>
-```
+const numDel = () => {
+if (locked) return;
+setInput((prev) => prev.slice(0, -1));
+};
 
-</head>
-<body>
-
-<div class="container">
-    <h1>Champion des Tables 🏆</h1>
+const checkAnswer = () => {
+if (locked || input === “”) return;
+const userAnswer = parseInt(input);
+const correctAnswer = currentCard.a * currentCard.b;
+const isCorrect = userAnswer === correctAnswer;
+setLocked(true);
+setCardState(isCorrect ? “correct” : “wrong”);
 
 ```
-<div id="setup-screen">
-    <p class="instructions">Choisis tes tables de travail :</p>
-    <div class="selection-menu">
-        <div class="table-btn" onclick="toggleTable(2)">x 2</div>
-        <div class="table-btn" onclick="toggleTable(3)">x 3</div>
-        <div class="table-btn" onclick="toggleTable(4)">x 4</div>
-        <div class="table-btn" onclick="toggleTable(5)">x 5</div>
-        <div class="table-btn" onclick="toggleTable(6)">x 6</div>
-        <div class="table-btn" onclick="toggleTable(7)">x 7</div>
-        <div class="table-btn" onclick="toggleTable(8)">x 8</div>
-        <div class="table-btn" onclick="toggleTable(9)">x 9</div>
-        <div class="table-btn" onclick="toggleTable(10)">x 10</div>
-    </div>
-    <button class="btn-start" onclick="startGame()" id="start-btn" disabled>Commencer l'entraînement</button>
-    <br>
-    <button class="reset-btn" onclick="resetAll()">Effacer toute la progression</button>
+if (isCorrect) {
+  setAnimCard("fly-right");
+  const nextBox = Math.min(currentCard.box + 1, 5);
+  setTimeout(() => {
+    const newDeck = deck.map((c) =>
+      c === currentCard ? { ...c, box: nextBox } : c
+    );
+    setDeck(newDeck);
+    setPulseBox(nextBox);
+    setTimeout(() => setPulseBox(null), 420);
+    const next = pickCard(newDeck, selectedTables);
+    setCurrentCard(next);
+    setInput("");
+    setLocked(false);
+    setCardState("");
+    setAnimCard("");
+    setFeedback(null);
+    if (!next) setScreen("done");
+  }, 460);
+} else {
+  setAnimCard("shake");
+  setTimeout(() => {
+    setAnimCard("");
+    setFeedback({ correctAnswer });
+  }, 460);
+}
+```
+
+};
+
+const handleWrong = () => {
+setAnimCard(“fly-left”);
+setTimeout(() => {
+const newDeck = deck.map((c) =>
+c === currentCard ? { …c, box: 1 } : c
+);
+setDeck(newDeck);
+setPulseBox(1);
+setTimeout(() => setPulseBox(null), 420);
+const next = pickCard(newDeck, selectedTables);
+setCurrentCard(next);
+setInput(””);
+setLocked(false);
+setCardState(””);
+setAnimCard(””);
+setFeedback(null);
+if (!next) setScreen(“done”);
+}, 460);
+};
+
+const backToMenu = () => {
+setScreen(“setup”);
+setCurrentCard(null);
+setInput(””);
+setLocked(false);
+setCardState(””);
+setAnimCard(””);
+setFeedback(null);
+};
+
+const resetAll = () => {
+if (window.confirm(“Veux-tu vraiment recommencer à zéro ?”)) {
+setDeck([]);
+setSelectedTables([]);
+setCurrentCard(null);
+setScreen(“setup”);
+}
+};
+
+const counts = boxCounts(deck, selectedTables);
+const buildings = [
+{ id: 1, icon: “🛖”, label: “Cabane” },
+{ id: 2, icon: “🏠”, label: “Maison” },
+{ id: 3, icon: “🏯”, label: “Manoir” },
+{ id: 4, icon: “🏰”, label: “Chateau” },
+{ id: 5, icon: “👑”, label: “Palais” },
+];
+
+const activeBox = currentCard ? currentCard.box : screen === “done” ? 5 : 0;
+
+return (
+<div style={styles.body}>
+<div style={styles.container}>
+<h1 style={styles.h1}>Champion des Tables 🏆</h1>
+
+```
+    {/* SETUP */}
+    {screen === "setup" && (
+      <div>
+        <p style={styles.subtitle}>Choisis tes tables de travail :</p>
+        <div style={styles.selectionMenu}>
+          {[2,3,4,5,6,7,8,9,10].map((n) => (
+            <button
+              key={n}
+              onClick={() => toggleTable(n)}
+              style={{
+                ...styles.tableBtn,
+                ...(selectedTables.includes(n) ? styles.tableBtnActive : {}),
+              }}
+            >
+              x {n}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={startGame}
+          disabled={selectedTables.length === 0}
+          style={{
+            ...styles.btnStart,
+            ...(selectedTables.length === 0 ? styles.btnStartDisabled : {}),
+          }}
+        >
+          Commencer l'entraînement
+        </button>
+        <br />
+        <button onClick={resetAll} style={styles.resetBtn}>
+          Effacer toute la progression
+        </button>
+      </div>
+    )}
+
+    {/* GAME */}
+    {(screen === "game" || screen === "done") && (
+      <div style={styles.gameScreen}>
+        {/* Flashcard */}
+        <div
+          style={{
+            ...styles.card,
+            ...(cardState === "correct" ? styles.cardCorrect : {}),
+            ...(cardState === "wrong" ? styles.cardWrong : {}),
+            animation:
+              animCard === "fly-right"
+                ? "flyRight 0.45s ease forwards"
+                : animCard === "fly-left"
+                ? "flyLeft 0.45s ease forwards"
+                : animCard === "shake"
+                ? "shake 0.45s ease"
+                : "none",
+          }}
+        >
+          {screen === "done"
+            ? "FINI ! ✨"
+            : currentCard
+            ? `${currentCard.a} x ${currentCard.b}`
+            : "?"}
+        </div>
+
+        {/* Answer display */}
+        {screen === "game" && (
+          <div
+            style={{
+              ...styles.answerDisplay,
+              ...(input === "" ? styles.answerEmpty : {}),
+              ...(cardState === "correct" ? styles.answerCorrect : {}),
+              ...(cardState === "wrong" ? styles.answerWrong : {}),
+            }}
+          >
+            {input === "" ? "?" : input}
+          </div>
+        )}
+
+        {/* Feedback */}
+        <div style={styles.feedback}>
+          {screen === "done" && (
+            <p style={{ ...styles.feedbackMsg, color: "#2ecc71" }}>
+              Toutes les tables sont au Palais !
+            </p>
+          )}
+          {feedback && (
+            <>
+              <p style={{ ...styles.feedbackMsg, color: "#e74c3c" }}>
+                ❌ Faux ! C'était <strong>{feedback.correctAnswer}</strong>
+              </p>
+              <button onClick={handleWrong} style={styles.btnUnderstood}>
+                C'est compris
+              </button>
+            </>
+          )}
+          {cardState === "correct" && !feedback && (
+            <p style={{ ...styles.feedbackMsg, color: "#2ecc71" }}>✅ Bravo !</p>
+          )}
+        </div>
+
+        {/* Numpad */}
+        {screen === "game" && (
+          <div style={styles.numpad}>
+            {[7,8,9,4,5,6,1,2,3].map((d) => (
+              <button key={d} onClick={() => numPress(d)} style={styles.numBtn}>
+                {d}
+              </button>
+            ))}
+            <button onClick={numDel} style={{ ...styles.numBtn, ...styles.numBtnDel }}>⌫</button>
+            <button onClick={() => numPress(0)} style={styles.numBtn}>0</button>
+            <button
+              onClick={checkAnswer}
+              style={{
+                ...styles.numBtn,
+                ...styles.numBtnOk,
+                ...(input === "" ? styles.numBtnOkDisabled : {}),
+              }}
+            >
+              OK
+            </button>
+          </div>
+        )}
+
+        {/* Buildings */}
+        <div style={styles.buildings}>
+          {buildings.map((b) => {
+            const isActive = activeBox === b.id;
+            const isPulse = pulseBox === b.id;
+            return (
+              <div key={b.id} style={styles.building}>
+                <div
+                  style={{
+                    ...styles.buildingIcon,
+                    ...(isActive ? styles.buildingIconActive : {}),
+                    animation: isPulse ? "buildingPop 0.4s ease" : "none",
+                  }}
+                >
+                  {b.icon}
+                </div>
+                <div
+                  style={{
+                    ...styles.buildingCount,
+                    ...(isActive ? styles.buildingCountActive : {}),
+                  }}
+                >
+                  {counts[b.id] || 0}
+                </div>
+                <div
+                  style={{
+                    ...styles.buildingLabel,
+                    ...(isActive ? styles.buildingLabelActive : {}),
+                  }}
+                >
+                  {b.label}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <button onClick={backToMenu} style={styles.linkBtn}>
+          Changer de tables
+        </button>
+      </div>
+    )}
+  </div>
+
+  <style>{`
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-10px); }
+      40%      { transform: translateX(10px); }
+      60%      { transform: translateX(-6px); }
+      80%      { transform: translateX(6px); }
+    }
+    @keyframes flyRight {
+      0%   { transform: scale(1) translate(0,0); opacity: 1; }
+      100% { transform: scale(0.12) translate(200px, 100px); opacity: 0; }
+    }
+    @keyframes flyLeft {
+      0%   { transform: scale(1) translate(0,0); opacity: 1; }
+      100% { transform: scale(0.12) translate(-200px, 100px); opacity: 0; }
+    }
+    @keyframes buildingPop {
+      0%   { transform: scale(1.28); }
+      45%  { transform: scale(1.7); }
+      100% { transform: scale(1.28); }
+    }
+  `}</style>
 </div>
-
-<div id="game-screen" class="hidden">
-    <div id="flashcard" class="card">?</div>
-
-    <div class="input-row">
-        <input id="answer-input" type="number" inputmode="numeric" placeholder="?" autocomplete="off" />
-        <button id="btn-validate" onclick="checkAnswer()">OK</button>
-    </div>
-
-    <div class="feedback" id="feedback">
-        <p class="instructions">Tape ta réponse et appuie sur OK</p>
-    </div>
-
-    <div class="compartments">
-        <div class="box"><h4>B1</h4><span id="b1">0</span></div>
-        <div class="box"><h4>B2</h4><span id="b2">0</span></div>
-        <div class="box"><h4>B3</h4><span id="b3">0</span></div>
-        <div class="box"><h4>B4</h4><span id="b4">0</span></div>
-        <div class="box"><h4>B5</h4><span id="b5">0</span></div>
-    </div>
-
-    <button class="link-btn" onclick="backToMenu()">Changer de tables</button>
-</div>
 ```
 
-</div>
+);
+}
 
-<script>
-    let deck = JSON.parse(localStorage.getItem('multipliLeitnerV3')) || [];
-    let selectedTables = [];
-    let currentCard = null;
-
-    const BOX_WEIGHTS = { 1: 8, 2: 4, 3: 2, 4: 1 };
-
-    function toggleTable(n) {
-        const idx = selectedTables.indexOf(n);
-        if (idx > -1) selectedTables.splice(idx, 1);
-        else selectedTables.push(n);
-        renderSelectionButtons();
-        document.getElementById('start-btn').disabled = selectedTables.length === 0;
-    }
-
-    function renderSelectionButtons() {
-        document.querySelectorAll('.table-btn').forEach(btn => {
-            const num = parseInt(btn.innerText.replace('x ', ''));
-            btn.classList.toggle('active', selectedTables.includes(num));
-        });
-    }
-
-    function startGame() {
-        selectedTables.forEach(t => {
-            for (let i = 1; i <= 10; i++) {
-                if (!deck.find(c => c.a === t && c.b === i)) {
-                    deck.push({ a: t, b: i, box: 1 });
-                }
-            }
-        });
-        save();
-        document.getElementById('setup-screen').classList.add('hidden');
-        document.getElementById('game-screen').classList.remove('hidden');
-        nextQuestion();
-    }
-
-    function save() {
-        localStorage.setItem('multipliLeitnerV3', JSON.stringify(deck));
-        updateUI();
-    }
-
-    function updateUI() {
-        const activeDeck = deck.filter(c => selectedTables.includes(c.a));
-        for (let i = 1; i <= 5; i++) {
-            document.getElementById(`b${i}`).innerText = activeDeck.filter(c => c.box === i).length;
-        }
-    }
-
-    function nextQuestion() {
-        const activeDeck = deck.filter(c => selectedTables.includes(c.a) && c.box < 5);
-
-        if (activeDeck.length === 0) {
-            document.getElementById('flashcard').innerText = "FINI ! ✨";
-            document.getElementById('flashcard').style.fontSize = "2.5rem";
-            document.getElementById('flashcard').className = 'card';
-            document.getElementById('feedback').innerHTML = '<p class="instructions">Toutes les tables choisies sont en Boîte 5 !</p>';
-            document.getElementById('answer-input').classList.add('hidden');
-            document.getElementById('btn-validate').classList.add('hidden');
-            return;
-        }
-
-        const weightedPool = [];
-        activeDeck.forEach(card => {
-            const weight = BOX_WEIGHTS[card.box] || 1;
-            for (let i = 0; i < weight; i++) weightedPool.push(card);
-        });
-        currentCard = weightedPool[Math.floor(Math.random() * weightedPool.length)];
-
-        const input = document.getElementById('answer-input');
-        const flashcard = document.getElementById('flashcard');
-        flashcard.innerText = `${currentCard.a} × ${currentCard.b}`;
-        flashcard.style.fontSize = "3.5rem";
-        flashcard.className = 'card';
-        input.value = '';
-        input.disabled = false;
-        input.classList.remove('hidden');
-        document.getElementById('btn-validate').disabled = false;
-        document.getElementById('btn-validate').classList.remove('hidden');
-        document.getElementById('feedback').innerHTML = '<p class="instructions">Tape ta réponse et appuie sur OK</p>';
-
-        setTimeout(() => input.focus(), 100);
-    }
-
-    function checkAnswer() {
-        const input = document.getElementById('answer-input');
-        const userAnswer = parseInt(input.value);
-        if (isNaN(userAnswer)) return;
-
-        const correctAnswer = currentCard.a * currentCard.b;
-        const isCorrect = userAnswer === correctAnswer;
-
-        input.disabled = true;
-        document.getElementById('btn-validate').disabled = true;
-
-        const flashcard = document.getElementById('flashcard');
-        const feedback = document.getElementById('feedback');
-
-        if (isCorrect) {
-            flashcard.classList.add('correct');
-            feedback.innerHTML = '<p class="feedback-msg correct">✅ Bravo !</p>';
-            if (currentCard.box < 5) currentCard.box++;
-            save();
-            setTimeout(nextQuestion, 1000);
-        } else {
-            flashcard.classList.add('wrong');
-            feedback.innerHTML = `
-                <p class="feedback-msg wrong">❌ Faux ! La bonne réponse était <strong>${correctAnswer}</strong></p>
-                <button class="btn-understood" onclick="handleWrong()">C'est compris</button>
-            `;
-        }
-    }
-
-    function handleWrong() {
-        currentCard.box = 1;
-        save();
-        nextQuestion();
-    }
-
-    document.getElementById('answer-input').addEventListener('keydown', e => {
-        if (e.key === 'Enter') checkAnswer();
-    });
-
-    function backToMenu() {
-        document.getElementById('setup-screen').classList.remove('hidden');
-        document.getElementById('game-screen').classList.add('hidden');
-    }
-
-    function resetAll() {
-        if (confirm("Veux-tu vraiment recommencer à zéro et effacer toutes les boîtes ?")) {
-            localStorage.removeItem('multipliLeitnerV3');
-            deck = [];
-            selectedTables = [];
-            renderSelectionButtons();
-            document.getElementById('start-btn').disabled = true;
-        }
-    }
-</script>
-
-</body>
-</html>
+const styles = {
+body: {
+fontFamily: “‘Segoe UI’, sans-serif”,
+background: “#f0f4f8”,
+display: “flex”,
+flexDirection: “column”,
+alignItems: “center”,
+minHeight: “100vh”,
+padding: “12px”,
+},
+container: {
+background: “white”,
+padding: “16px”,
+borderRadius: “20px”,
+boxShadow: “0 10px 25px rgba(0,0,0,0.1)”,
+width: “100%”,
+maxWidth: “420px”,
+textAlign: “center”,
+},
+h1: { color: “#2c3e50”, fontSize: “1.4rem”, marginBottom: “4px” },
+subtitle: { fontSize: “0.9rem”, color: “#7f8c8d”, margin: “8px 0” },
+selectionMenu: {
+display: “grid”,
+gridTemplateColumns: “repeat(3, 1fr)”,
+gap: “8px”,
+margin: “12px 0”,
+padding: “10px”,
+background: “#f8f9fa”,
+borderRadius: “12px”,
+},
+tableBtn: {
+padding: “12px 5px”,
+border: “2px solid #3498db”,
+borderRadius: “10px”,
+cursor: “pointer”,
+background: “white”,
+fontWeight: “bold”,
+fontSize: “0.9rem”,
+},
+tableBtnActive: { background: “#3498db”, color: “white” },
+btnStart: {
+width: “100%”, padding: “15px”,
+fontSize: “1rem”, border: “none”,
+borderRadius: “12px”, cursor: “pointer”,
+fontWeight: “bold”, background: “#3498db”, color: “white”,
+},
+btnStartDisabled: { background: “#bdc3c7”, cursor: “default” },
+resetBtn: {
+background: “none”, color: “#bdc3c7”,
+fontSize: “0.7rem”, border: “none”,
+cursor: “pointer”, marginTop: “16px”,
+},
+gameScreen: { display: “flex”, flexDirection: “column”, gap: “10px” },
+card: {
+width: “100%”, height: “120px”,
+background: “#fff”,
+border: “4px solid #3498db”,
+borderRadius: “15px”,
+display: “flex”,
+justifyContent: “center”,
+alignItems: “center”,
+fontSize: “3.2rem”,
+fontWeight: “bold”,
+},
+cardCorrect: { borderColor: “#2ecc71” },
+cardWrong: { borderColor: “#e74c3c” },
+answerDisplay: {
+width: “100%”, padding: “12px”,
+fontSize: “2.2rem”, fontWeight: “bold”,
+border: “3px solid #3498db”,
+borderRadius: “12px”, textAlign: “center”,
+background: “#f0f7ff”, color: “#2c3e50”,
+minHeight: “62px”, letterSpacing: “2px”,
+},
+answerEmpty: { color: “#bdc3c7” },
+answerCorrect: { borderColor: “#2ecc71”, background: “#eafaf1” },
+answerWrong: { borderColor: “#e74c3c”, background: “#fdf0f0” },
+feedback: {
+minHeight: “48px”,
+display: “flex”, alignItems: “center”,
+justifyContent: “center”,
+flexDirection: “column”, gap: “8px”,
+},
+feedbackMsg: { fontSize: “1rem”, fontWeight: “bold” },
+btnUnderstood: {
+padding: “12px 22px”, fontSize: “0.95rem”,
+border: “none”, borderRadius: “12px”,
+cursor: “pointer”, fontWeight: “bold”,
+background: “#e74c3c”, color: “white”,
+},
+numpad: {
+display: “grid”,
+gridTemplateColumns: “repeat(3, 1fr)”,
+gap: “8px”,
+},
+numBtn: {
+padding: “0”, height: “58px”,
+fontSize: “1.5rem”, fontWeight: “bold”,
+border: “2px solid #dde3ea”,
+borderRadius: “12px”, cursor: “pointer”,
+background: “white”, color: “#2c3e50”,
+display: “flex”, alignItems: “center”,
+justifyContent: “center”,
+},
+numBtnDel: {
+background: “#fef3e8”, borderColor: “#f5cba7”,
+color: “#e67e22”, fontSize: “1.3rem”,
+},
+numBtnOk: {
+background: “#3498db”, borderColor: “#2980b9”,
+color: “white”, fontSize: “1.1rem”,
+},
+numBtnOkDisabled: { background: “#bdc3c7”, borderColor: “#bdc3c7”, cursor: “default” },
+buildings: {
+display: “flex”, justifyContent: “space-around”,
+alignItems: “flex-end”,
+padding: “8px 0 2px 0”,
+borderTop: “2px solid #f0f4f8”,
+},
+building: {
+display: “flex”, flexDirection: “column”,
+alignItems: “center”, gap: “2px”, flex: 1,
+},
+buildingIcon: {
+fontSize: “1.5rem”, lineHeight: 1,
+filter: “grayscale(0.6) opacity(0.45)”,
+transition: “transform 0.2s, filter 0.2s”,
+display: “block”,
+},
+buildingIconActive: { filter: “none”, transform: “scale(1.28)” },
+buildingCount: { fontSize: “0.72rem”, fontWeight: “bold”, color: “#aab” },
+buildingCountActive: { color: “#2c3e50” },
+buildingLabel: { fontSize: “0.55rem”, color: “#ccd” },
+buildingLabelActive: { color: “#7f8c8d” },
+linkBtn: {
+background: “none”, color: “#3498db”,
+fontSize: “0.82rem”, border: “none”,
+textDecoration: “underline”, cursor: “pointer”,
+marginTop: “4px”,
+},
+};
