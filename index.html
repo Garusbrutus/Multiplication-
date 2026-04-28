@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -10,510 +9,679 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
-```
-html, body {
-    height: 100%;
-    height: 100dvh;
-    overflow: hidden;
-    background: #f0f4f8;
-    font-family: 'Segoe UI', sans-serif;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-}
+    html, body {
+        height: 100%; height: 100dvh; overflow: hidden;
+        background: #f0f4f8; font-family: 'Segoe UI', sans-serif;
+        -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    }
+    body { display: flex; justify-content: center; align-items: stretch; }
 
-body {
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
-}
+    .container {
+        background: white; width: 100%; max-width: 420px;
+        display: flex; flex-direction: column;
+        height: 100%; height: 100dvh;
+        padding: 12px 14px; overflow: hidden; position: relative;
+    }
 
-.container {
-    background: white;
-    width: 100%;
-    max-width: 420px;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    height: 100dvh;
-    padding: 12px 14px;
-    overflow: hidden;
-    position: relative;
-}
+    h1 {
+        color: #2c3e50; font-size: 1.3rem;
+        text-align: center; flex-shrink: 0; padding-bottom: 6px;
+    }
 
-h1 {
-    color: #2c3e50;
-    font-size: 1.3rem;
-    text-align: center;
-    flex-shrink: 0;
-    padding-bottom: 6px;
-}
+    /* ══════════════════════════════
+       PROFILE SCREEN
+    ══════════════════════════════ */
+    #profile-screen {
+        display: flex; flex-direction: column; flex: 1; overflow: hidden; gap: 10px;
+    }
+    .profile-subtitle {
+        font-size: 0.85rem; color: #7f8c8d; text-align: center; flex-shrink: 0;
+    }
+    .profile-list {
+        display: flex; flex-direction: column; gap: 8px;
+        overflow-y: auto; flex: 1; padding: 2px 0;
+    }
+    .profile-item {
+        display: flex; align-items: center; gap: 10px;
+        border: 2px solid #e8edf2; border-radius: 14px;
+        padding: 12px 14px; cursor: pointer;
+        transition: border-color 0.15s, background 0.15s; background: white;
+    }
+    .profile-item:active { background: #f0f7ff; border-color: #3498db; }
+    .profile-avatar { font-size: 1.8rem; line-height: 1; flex-shrink: 0; }
+    .profile-info { flex: 1; min-width: 0; }
+    .profile-name { font-weight: bold; font-size: 1rem; color: #2c3e50; }
+    .profile-stats { font-size: 0.72rem; color: #7f8c8d; margin-top: 2px; }
+    .profile-arrow { color: #bdc3c7; font-size: 1.1rem; flex-shrink: 0; }
+    .profile-delete-btn {
+        background: none; border: none; cursor: pointer;
+        color: #e74c3c; font-size: 1.1rem; padding: 4px; flex-shrink: 0; opacity: 0.5;
+    }
+    .profile-delete-btn:active { opacity: 1; }
+    .profile-add {
+        display: flex; align-items: center; gap: 10px;
+        border: 2px dashed #bdc3c7; border-radius: 14px;
+        padding: 10px 14px; cursor: pointer; transition: border-color 0.15s; flex-shrink: 0;
+    }
+    .profile-add:active { border-color: #3498db; }
+    .profile-add-icon { font-size: 1.4rem; color: #bdc3c7; }
+    .profile-add-label { font-size: 0.9rem; color: #7f8c8d; }
+    .profile-form {
+        display: none; flex-direction: column; gap: 10px; flex-shrink: 0;
+        padding: 14px; background: #f8f9fa; border-radius: 14px;
+    }
+    .profile-form.visible { display: flex; }
+    .profile-form-title { font-size: 0.85rem; font-weight: bold; color: #2c3e50; }
+    .avatar-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+    .avatar-opt {
+        font-size: 1.6rem; cursor: pointer; border-radius: 10px;
+        border: 2px solid transparent; padding: 4px;
+        transition: border-color 0.15s, background 0.15s;
+    }
+    .avatar-opt.selected { border-color: #3498db; background: #eaf2fb; }
+    .profile-name-input {
+        width: 100%; padding: 10px 12px; font-size: 1rem;
+        border: 2px solid #dde3ea; border-radius: 10px; outline: none; font-family: inherit;
+    }
+    .profile-name-input:focus { border-color: #3498db; }
+    .profile-form-actions { display: flex; gap: 8px; }
+    .btn-profile-save {
+        flex: 1; padding: 10px; font-size: 0.9rem; border: none;
+        border-radius: 10px; cursor: pointer; font-weight: bold; background: #3498db; color: white;
+    }
+    .btn-profile-save:disabled { background: #bdc3c7; cursor: default; }
+    .btn-profile-cancel {
+        flex: 1; padding: 10px; font-size: 0.9rem;
+        border: 2px solid #bdc3c7; border-radius: 10px; cursor: pointer;
+        font-weight: bold; background: white; color: #7f8c8d;
+    }
 
-/* ── SETUP ── */
-#setup-screen {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow: hidden;
-}
+    /* ══════════════════════════════
+       SETUP SCREEN
+    ══════════════════════════════ */
+    #setup-screen {
+        display: flex; flex-direction: column; flex: 1; overflow: hidden;
+    }
+    .setup-header {
+        display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-shrink: 0;
+    }
+    .btn-back-profile {
+        background: none; border: none; cursor: pointer;
+        color: #3498db; font-size: 1.3rem; padding: 2px 4px; flex-shrink: 0;
+    }
+    .active-profile-badge { display: flex; align-items: center; gap: 6px; flex: 1; }
+    .active-profile-badge .av { font-size: 1.2rem; }
+    .active-profile-badge .nm { font-weight: bold; font-size: 0.95rem; color: #2c3e50; }
 
-#setup-screen > p {
-    font-size: 0.85rem;
-    color: #7f8c8d;
-    text-align: center;
-    margin-bottom: 8px;
-    flex-shrink: 0;
-}
+    #setup-screen > p {
+        font-size: 0.85rem; color: #7f8c8d;
+        text-align: center; margin-bottom: 8px; flex-shrink: 0;
+    }
+    .selection-menu {
+        display: grid; grid-template-columns: repeat(3, 1fr);
+        gap: 6px; padding: 8px; background: #f8f9fa; border-radius: 12px; flex-shrink: 0;
+    }
+    .table-btn {
+        padding: 8px 5px 6px; border: 2px solid #3498db; border-radius: 10px;
+        cursor: pointer; background: white; font-weight: bold; font-size: 0.9rem;
+        transition: 0.2s; text-align: center;
+        display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .table-btn.active { background: #3498db; color: white; }
+    .table-btn.reset-mode { border-color: #e74c3c; color: #e74c3c; background: white; }
+    .table-btn.reset-mode.marked { background: #e74c3c; color: white; }
+    .table-prog-wrap {
+        width: 100%; height: 4px; background: #e8edf2; border-radius: 999px; overflow: hidden;
+    }
+    .table-btn.active .table-prog-wrap { background: rgba(255,255,255,0.35); }
+    .table-prog-bar { height: 100%; border-radius: 999px; background: #3498db; transition: width 0.4s ease; }
+    .table-btn.active .table-prog-bar { background: white; }
+    .table-prog-pct { font-size: 0.55rem; font-weight: normal; color: #aab; line-height: 1; }
+    .table-btn.active .table-prog-pct { color: rgba(255,255,255,0.8); }
 
-.selection-menu {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-    padding: 8px;
-    background: #f8f9fa;
-    border-radius: 12px;
-    flex-shrink: 0;
-}
+    .setup-footer {
+        margin-top: auto; display: flex; flex-direction: column;
+        align-items: center; gap: 8px; padding-top: 10px; flex-shrink: 0;
+    }
+    .btn-start {
+        width: 100%; padding: 14px; font-size: 1rem; border: none;
+        border-radius: 12px; cursor: pointer; font-weight: bold; background: #3498db; color: white;
+    }
+    .btn-start:disabled { background: #bdc3c7; cursor: default; }
+    .reset-section { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .reset-trigger-btn { background: none; color: #bdc3c7; font-size: 0.7rem; border: none; cursor: pointer; text-decoration: underline; }
+    .reset-controls { display: none; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
+    .reset-controls.visible { display: flex; }
+    .reset-hint { font-size: 0.75rem; color: #e74c3c; text-align: center; }
+    .reset-actions { display: flex; gap: 8px; width: 100%; }
+    .btn-reset-confirm {
+        flex: 1; padding: 10px; font-size: 0.85rem; border: none;
+        border-radius: 10px; cursor: pointer; font-weight: bold; background: #e74c3c; color: white;
+    }
+    .btn-reset-confirm:disabled { background: #f1a9a0; cursor: default; }
+    .btn-reset-cancel {
+        flex: 1; padding: 10px; font-size: 0.85rem;
+        border: 2px solid #bdc3c7; border-radius: 10px; cursor: pointer;
+        font-weight: bold; background: white; color: #7f8c8d;
+    }
 
-.table-btn {
-    padding: 8px 5px 6px;
-    border: 2px solid #3498db;
-    border-radius: 10px;
-    cursor: pointer;
-    background: white;
-    font-weight: bold;
-    font-size: 0.9rem;
-    transition: 0.2s;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-}
-.table-btn.active { background: #3498db; color: white; }
-.table-btn.reset-mode { border-color: #e74c3c; color: #e74c3c; background: white; }
-.table-btn.reset-mode.marked { background: #e74c3c; color: white; }
+    /* ══════════════════════════════
+       GAME SCREEN
+    ══════════════════════════════ */
+    #game-screen {
+        display: flex; flex-direction: column; flex: 1; overflow: hidden;
+    }
 
-/* Progress bar inside each table button */
-.table-prog-wrap {
-    width: 100%;
-    height: 4px;
-    background: #e8edf2;
-    border-radius: 999px;
-    overflow: hidden;
-}
-.table-btn.active .table-prog-wrap { background: rgba(255,255,255,0.35); }
-.table-prog-bar {
-    height: 100%;
-    border-radius: 999px;
-    background: #3498db;
-    transition: width 0.4s ease;
-}
-.table-btn.active .table-prog-bar { background: white; }
-.table-prog-pct {
-    font-size: 0.55rem;
-    font-weight: normal;
-    color: #aab;
-    line-height: 1;
-}
-.table-btn.active .table-prog-pct { color: rgba(255,255,255,0.8); }
+    /* Flashcard */
+    .card {
+        width: 100%; flex: 0 0 auto; min-height: 100px; max-height: 140px;
+        background: #fff; border: 4px solid #3498db; border-radius: 14px;
+        display: flex; justify-content: center; align-items: center;
+        font-size: clamp(2rem, 8vw, 3.2rem); font-weight: bold;
+        margin: 4px 0; transition: border-color 0.3s; overflow: visible;
+    }
+    .card.correct-progress  { border-color: #2ecc71; }
+    .card.correct-same      { border-color: #f39c12; }
+    .card.correct-regress   { border-color: #e74c3c; }
+    .card.wrong             { border-color: #e74c3c; }
 
-.setup-footer {
-    margin-top: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding-top: 10px;
-    flex-shrink: 0;
-}
+    @keyframes shake {
+        0%,100% { transform: translateX(0); }
+        20% { transform: translateX(-10px); }
+        40% { transform: translateX(10px); }
+        60% { transform: translateX(-6px); }
+        80% { transform: translateX(6px); }
+    }
+    @keyframes flyRight {
+        0%   { transform: scale(1) translate(0,0); opacity: 1; }
+        100% { transform: scale(0.12) translate(200px,80px); opacity: 0; }
+    }
+    @keyframes flyLeft {
+        0%   { transform: scale(1) translate(0,0); opacity: 1; }
+        100% { transform: scale(0.12) translate(-200px,80px); opacity: 0; }
+    }
+    .card.anim-shake     { animation: shake 0.45s ease; }
+    .card.anim-fly-right { animation: flyRight 0.45s ease forwards; }
+    .card.anim-fly-left  { animation: flyLeft 0.45s ease forwards; }
 
-.btn-start {
-    width: 100%; padding: 14px;
-    font-size: 1rem; border: none;
-    border-radius: 12px; cursor: pointer;
-    font-weight: bold; background: #3498db; color: white;
-}
-.btn-start:disabled { background: #bdc3c7; cursor: default; }
+    /* Answer display */
+    .answer-display {
+        width: 100%; flex-shrink: 0; padding: 8px;
+        font-size: clamp(1.4rem, 6vw, 2rem); font-weight: bold;
+        border: 3px solid #3498db; border-radius: 12px;
+        text-align: center; background: #f0f7ff; color: #2c3e50;
+        letter-spacing: 2px; margin-bottom: 4px;
+    }
+    .answer-display.empty   { color: #bdc3c7; }
+    .answer-display.correct { border-color: #2ecc71; background: #eafaf1; }
+    .answer-display.wrong   { border-color: #e74c3c; background: #fdf0f0; }
 
-.reset-section { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.reset-trigger-btn { background: none; color: #bdc3c7; font-size: 0.7rem; border: none; cursor: pointer; text-decoration: underline; }
-.reset-controls { display: none; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
-.reset-controls.visible { display: flex; }
-.reset-hint { font-size: 0.75rem; color: #e74c3c; text-align: center; }
-.reset-actions { display: flex; gap: 8px; width: 100%; }
-.btn-reset-confirm {
-    flex: 1; padding: 10px; font-size: 0.85rem; border: none;
-    border-radius: 10px; cursor: pointer; font-weight: bold;
-    background: #e74c3c; color: white;
-}
-.btn-reset-confirm:disabled { background: #f1a9a0; cursor: default; }
-.btn-reset-cancel {
-    flex: 1; padding: 10px; font-size: 0.85rem;
-    border: 2px solid #bdc3c7; border-radius: 10px; cursor: pointer;
-    font-weight: bold; background: white; color: #7f8c8d;
-}
+    /* Feedback */
+    .feedback {
+        flex-shrink: 0; min-height: 52px;
+        display: flex; align-items: center; justify-content: center;
+        flex-direction: column; gap: 4px; margin-bottom: 4px;
+    }
+    .feedback-msg { font-size: 0.95rem; font-weight: bold; text-align: center; }
+    .feedback-msg.progress { color: #2ecc71; }
+    .feedback-msg.same     { color: #f39c12; }
+    .feedback-msg.regress  { color: #e74c3c; }
+    .feedback-msg.wrong    { color: #e74c3c; }
+    .feedback-time {
+        font-size: 0.8rem; color: #7f8c8d; font-weight: normal;
+    }
+    .btn-understood {
+        padding: 8px 24px; font-size: 0.9rem; border: none;
+        border-radius: 12px; cursor: pointer; font-weight: bold;
+        background: #e74c3c; color: white; margin-top: 4px;
+    }
+    .btn-next {
+        padding: 8px 24px; font-size: 0.9rem; border: none;
+        border-radius: 12px; cursor: pointer; font-weight: bold;
+        background: #2ecc71; color: white; margin-top: 4px;
+    }
+    .btn-next.orange { background: #f39c12; }
 
-/* ── GAME ── */
-#game-screen {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    gap: 0;
-    overflow: hidden;
-}
+    /* Numpad */
+    .numpad {
+        display: grid; grid-template-columns: repeat(3, 1fr);
+        gap: 6px; flex: 1; min-height: 0;
+    }
+    .num-btn {
+        font-size: clamp(1.1rem, 5vw, 1.5rem); font-weight: bold;
+        border: 2px solid #dde3ea; border-radius: 12px; cursor: pointer;
+        background: white; color: #2c3e50;
+        display: flex; align-items: center; justify-content: center;
+        transition: background 0.1s, transform 0.1s;
+        user-select: none; min-height: 0;
+    }
+    .num-btn:active { background: #eaf2fb; transform: scale(0.93); }
+    .num-btn.del { background: #fef3e8; border-color: #f5cba7; color: #e67e22; }
+    .num-btn.del:active { background: #fde8cc; }
+    .num-btn.ok  { background: #3498db; border-color: #2980b9; color: white; }
+    .num-btn.ok:active  { background: #2980b9; }
+    .num-btn.ok.disabled { background: #bdc3c7; border-color: #bdc3c7; cursor: default; }
 
-/* Game header: timer + stop button */
-.game-header {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-    height: 32px;
-}
-.timer-wrap {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.timer-bar-bg {
-    flex: 1; height: 10px;
-    background: #ecf0f1; border-radius: 999px; overflow: hidden;
-}
-.timer-bar {
-    height: 100%; border-radius: 999px;
-    background: #2ecc71;
-    transition: width 1s linear, background 0.4s;
-    width: 100%;
-}
-.timer-bar.warn   { background: #f39c12; }
-.timer-bar.danger { background: #e74c3c; }
-.timer-label {
-    font-size: 0.85rem; font-weight: bold;
-    color: #7f8c8d; min-width: 26px; text-align: right;
-}
-.timer-wrap.hidden-timer { visibility: hidden; }
+    /* Animals bar */
+    .animals {
+        flex-shrink: 0; display: flex; justify-content: space-around; align-items: flex-end;
+        padding: 6px 0 2px 0; border-top: 2px solid #f0f4f8; margin-top: 6px;
+    }
+    .animal { display: flex; flex-direction: column; align-items: center; gap: 1px; flex: 1; }
+    .animal .icon {
+        font-size: clamp(1.2rem, 5vw, 1.6rem); line-height: 1;
+        filter: grayscale(0.6) opacity(0.4); transition: transform 0.2s, filter 0.2s;
+    }
+    .animal .count { font-size: 0.68rem; font-weight: bold; color: #aab; }
+    .animal .label { font-size: 0.52rem; color: #ccd; }
+    .animal .speed-hint { font-size: 0.48rem; color: #b0b8c8; margin-top: 1px; }
+    .animal.active .icon  { filter: none; transform: scale(1.25); }
+    .animal.active .count { color: #2c3e50; }
+    .animal.active .label { color: #7f8c8d; }
+    .animal.active .speed-hint { color: #3498db; }
+    @keyframes animalPop {
+        0%   { transform: scale(1.25); }
+        45%  { transform: scale(1.65); }
+        100% { transform: scale(1.25); }
+    }
+    .animal.pulse .icon { animation: animalPop 0.4s ease; }
 
-.btn-stop {
-    flex-shrink: 0;
-    width: 32px; height: 32px;
-    border: none; border-radius: 8px;
-    background: #f0f4f8; color: #7f8c8d;
-    font-size: 1rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.15s, color 0.15s;
-}
-.btn-stop:active { background: #dde3ea; }
-/* Pause demandée mais pas encore effective */
-.btn-stop.pending {
-    background: #e67e22;
-    color: white;
-    animation: pulse-stop 0.8s ease-in-out infinite;
-}
-@keyframes pulse-stop {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50%       { opacity: 0.6; transform: scale(0.92); }
-}
+    .game-footer { flex-shrink: 0; text-align: center; padding-top: 4px; }
+    .link-btn {
+        background: none; color: #3498db;
+        font-size: 0.78rem; border: none; text-decoration: underline; cursor: pointer;
+    }
 
-/* Flashcard */
-.card {
-    width: 100%; flex: 0 0 auto;
-    min-height: 90px; max-height: 130px;
-    background: #fff; border: 4px solid #3498db;
-    border-radius: 14px;
-    display: flex; justify-content: center; align-items: center;
-    font-size: clamp(2rem, 8vw, 3.2rem); font-weight: bold;
-    margin: 4px 0; transition: border-color 0.3s; overflow: visible;
-}
-.card.correct { border-color: #2ecc71; }
-.card.wrong   { border-color: #e74c3c; }
+    /* Pause overlay */
+    #pause-overlay {
+        position: absolute; inset: 0; background: rgba(44,62,80,0.82);
+        display: flex; flex-direction: column; align-items: center;
+        justify-content: center; z-index: 100; backdrop-filter: blur(3px);
+    }
+    .pause-box {
+        background: white; border-radius: 20px; padding: 32px 28px;
+        display: flex; flex-direction: column; align-items: center; gap: 16px;
+        width: 80%; max-width: 280px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .pause-icon { font-size: 3rem; line-height: 1; }
+    .pause-title { font-size: 1.3rem; font-weight: bold; color: #2c3e50; }
+    .pause-sub { font-size: 0.82rem; color: #7f8c8d; text-align: center; }
+    .btn-resume {
+        width: 100%; padding: 14px; font-size: 1rem; border: none;
+        border-radius: 12px; cursor: pointer; font-weight: bold;
+        background: #3498db; color: white; margin-top: 4px;
+    }
 
-@keyframes shake {
-    0%,100% { transform: translateX(0); }
-    20% { transform: translateX(-10px); }
-    40% { transform: translateX(10px); }
-    60% { transform: translateX(-6px); }
-    80% { transform: translateX(6px); }
-}
-@keyframes flyRight {
-    0%   { transform: scale(1) translate(0,0); opacity: 1; }
-    100% { transform: scale(0.12) translate(200px,80px); opacity: 0; }
-}
-@keyframes flyLeft {
-    0%   { transform: scale(1) translate(0,0); opacity: 1; }
-    100% { transform: scale(0.12) translate(-200px,80px); opacity: 0; }
-}
-.card.anim-shake     { animation: shake 0.45s ease; }
-.card.anim-fly-right { animation: flyRight 0.45s ease forwards; }
-.card.anim-fly-left  { animation: flyLeft 0.45s ease forwards; }
+    .joke-text {
+        font-size: 0.85rem; color: #2c3e50; text-align: center;
+        font-style: italic; padding: 4px 8px;
+        background: #f8f9fa; border-radius: 8px; margin-top: 2px;
+    }
 
-.answer-display {
-    width: 100%; flex-shrink: 0;
-    padding: 8px;
-    font-size: clamp(1.4rem, 6vw, 2rem); font-weight: bold;
-    border: 3px solid #3498db; border-radius: 12px;
-    text-align: center; background: #f0f7ff; color: #2c3e50;
-    letter-spacing: 2px; margin-bottom: 4px;
-}
-.answer-display.empty   { color: #bdc3c7; }
-.answer-display.correct { border-color: #2ecc71; background: #eafaf1; }
-.answer-display.wrong   { border-color: #e74c3c; background: #fdf0f0; }
+    /* Delete confirmation overlay */
+    #delete-overlay {
+        position: absolute; inset: 0;
+        background: rgba(44,62,80,0.82);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 200; backdrop-filter: blur(3px);
+    }
+    .delete-box {
+        background: white; border-radius: 20px; padding: 28px 24px;
+        display: flex; flex-direction: column; align-items: center; gap: 12px;
+        width: 82%; max-width: 300px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .delete-icon { font-size: 2.4rem; line-height: 1; }
+    .delete-title { font-size: 1.1rem; font-weight: bold; color: #2c3e50; }
+    .delete-sub { font-size: 0.82rem; color: #7f8c8d; text-align: center; line-height: 1.4; }
+    .delete-actions { display: flex; gap: 8px; width: 100%; margin-top: 4px; }
+    .btn-delete-cancel {
+        flex: 1; padding: 11px; font-size: 0.9rem;
+        border: 2px solid #bdc3c7; border-radius: 10px; cursor: pointer;
+        font-weight: bold; background: white; color: #7f8c8d;
+    }
+    .btn-delete-confirm {
+        flex: 1; padding: 11px; font-size: 0.9rem; border: none;
+        border-radius: 10px; cursor: pointer; font-weight: bold;
+        background: #e74c3c; color: white;
+    }
 
-.feedback {
-    flex-shrink: 0; min-height: 44px;
-    display: flex; align-items: center; justify-content: center;
-    flex-direction: column; gap: 6px; margin-bottom: 4px;
-}
-.feedback-msg { font-size: 0.95rem; font-weight: bold; }
-.feedback-msg.correct { color: #2ecc71; }
-.feedback-msg.wrong   { color: #e74c3c; }
-.btn-understood {
-    padding: 10px 28px; font-size: 0.95rem;
-    border: none; border-radius: 12px; cursor: pointer;
-    font-weight: bold; background: #e74c3c; color: white; margin-top: 2px;
-}
-
-.numpad {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 6px; flex: 1; min-height: 0;
-}
-.num-btn {
-    font-size: clamp(1.1rem, 5vw, 1.5rem); font-weight: bold;
-    border: 2px solid #dde3ea; border-radius: 12px; cursor: pointer;
-    background: white; color: #2c3e50;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.1s, transform 0.1s;
-    user-select: none; min-height: 0;
-}
-.num-btn:active { background: #eaf2fb; transform: scale(0.93); }
-.num-btn.del { background: #fef3e8; border-color: #f5cba7; color: #e67e22; }
-.num-btn.del:active { background: #fde8cc; }
-.num-btn.ok  { background: #3498db; border-color: #2980b9; color: white; }
-.num-btn.ok:active  { background: #2980b9; }
-.num-btn.ok.disabled { background: #bdc3c7; border-color: #bdc3c7; cursor: default; }
-
-.buildings {
-    flex-shrink: 0;
-    display: flex; justify-content: space-around; align-items: flex-end;
-    padding: 6px 0 2px 0; border-top: 2px solid #f0f4f8; margin-top: 6px;
-}
-.building { display: flex; flex-direction: column; align-items: center; gap: 1px; flex: 1; }
-.building .icon {
-    font-size: clamp(1.2rem, 5vw, 1.6rem); line-height: 1;
-    filter: grayscale(0.6) opacity(0.4); transition: transform 0.2s, filter 0.2s;
-}
-.building .count { font-size: 0.68rem; font-weight: bold; color: #aab; }
-.building .label { font-size: 0.52rem; color: #ccd; }
-.building .timer-hint { font-size: 0.48rem; color: #b0b8c8; margin-top: 1px; }
-.building.active .icon  { filter: none; transform: scale(1.25); }
-.building.active .count { color: #2c3e50; }
-.building.active .label { color: #7f8c8d; }
-.building.active .timer-hint { color: #3498db; }
-
-@keyframes buildingPop {
-    0%   { transform: scale(1.25); }
-    45%  { transform: scale(1.65); }
-    100% { transform: scale(1.25); }
-}
-.building.pulse .icon { animation: buildingPop 0.4s ease; }
-
-.game-footer { flex-shrink: 0; text-align: center; padding-top: 4px; }
-.link-btn {
-    background: none; color: #3498db;
-    font-size: 0.78rem; border: none; text-decoration: underline; cursor: pointer;
-}
-
-/* ── PAUSE OVERLAY ── */
-#pause-overlay {
-    position: absolute; inset: 0;
-    background: rgba(44, 62, 80, 0.82);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 20px; z-index: 100;
-    backdrop-filter: blur(3px);
-}
-.pause-box {
-    background: white; border-radius: 20px;
-    padding: 32px 28px;
-    display: flex; flex-direction: column;
-    align-items: center; gap: 16px;
-    width: 80%; max-width: 280px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-}
-.pause-icon { font-size: 3rem; line-height: 1; }
-.pause-title { font-size: 1.3rem; font-weight: bold; color: #2c3e50; }
-.pause-sub { font-size: 0.82rem; color: #7f8c8d; text-align: center; }
-.btn-resume {
-    width: 100%; padding: 14px; font-size: 1rem;
-    border: none; border-radius: 12px; cursor: pointer;
-    font-weight: bold; background: #3498db; color: white; margin-top: 4px;
-}
-
-.hidden { display: none !important; }
-</style>
-```
-
+    .hidden { display: none !important; }
+    </style>
 </head>
 <body>
 <div class="container">
     <h1>Champion des Tables 🏆</h1>
 
-<!-- SETUP -->
+    <!-- ══ PROFILE SCREEN ══ -->
+    <div id="profile-screen">
+        <p class="profile-subtitle">Qui s'entraîne aujourd'hui ?</p>
+        <div class="profile-list" id="profile-list"></div>
+        <div class="profile-add" id="profile-add-row" onclick="showProfileForm()">
+            <span class="profile-add-icon">＋</span>
+            <span class="profile-add-label">Ajouter un profil</span>
+        </div>
+        <div class="profile-form" id="profile-form">
+            <div class="profile-form-title">Nouveau profil</div>
+            <div class="avatar-picker" id="avatar-picker"></div>
+            <input class="profile-name-input" id="profile-name-input" type="text"
+                   placeholder="Prénom…" maxlength="20" oninput="onNameInput()">
+            <div class="profile-form-actions">
+                <button class="btn-profile-cancel" onclick="hideProfileForm()">Annuler</button>
+                <button class="btn-profile-save" id="btn-profile-save" onclick="saveNewProfile()" disabled>Créer</button>
+            </div>
+        </div>
 
-<div id="setup-screen">
-    <p>Choisis tes tables de travail :</p>
-    <div class="selection-menu" id="selection-menu">
-        <div class="table-btn" data-n="2"  onclick="tableAction(2)">x 2<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
-        <div class="table-btn" data-n="3"  onclick="tableAction(3)">x 3<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
-        <div class="table-btn" data-n="4"  onclick="tableAction(4)">x 4<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
-        <div class="table-btn" data-n="5"  onclick="tableAction(5)">x 5<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
-        <div class="table-btn" data-n="6"  onclick="tableAction(6)">x 6<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
-        <div class="table-btn" data-n="7"  onclick="tableAction(7)">x 7<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
-        <div class="table-btn" data-n="8"  onclick="tableAction(8)">x 8<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
-        <div class="table-btn" data-n="9"  onclick="tableAction(9)">x 9<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
-        <div class="table-btn" data-n="10" onclick="tableAction(10)">x 10<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
-    </div>
-    <div class="setup-footer">
-        <button class="btn-start" onclick="startGame()" id="start-btn" disabled>Commencer l'entraînement</button>
-        <div class="reset-section">
-            <button class="reset-trigger-btn" id="reset-trigger-btn" onclick="enterResetMode()">Effacer la progression…</button>
-            <div class="reset-controls" id="reset-controls">
-                <p class="reset-hint">Sélectionne les tables à remettre à zéro :</p>
-                <div class="reset-actions">
-                    <button class="btn-reset-cancel" onclick="exitResetMode()">Annuler</button>
-                    <button class="btn-reset-confirm" id="btn-reset-confirm" onclick="confirmReset()" disabled>Effacer</button>
+        <!-- Delete confirmation overlay -->
+        <div id="delete-overlay" class="hidden">
+            <div class="delete-box">
+                <div class="delete-icon">🗑️</div>
+                <div class="delete-title">Supprimer ce profil ?</div>
+                <div class="delete-sub" id="delete-sub">Toute la progression de <strong id="delete-name"></strong> sera perdue.</div>
+                <div class="delete-actions">
+                    <button class="btn-delete-cancel" onclick="cancelDelete()">Annuler</button>
+                    <button class="btn-delete-confirm" onclick="confirmDelete()">Supprimer</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- GAME -->
-
-<div id="game-screen" class="hidden">
-
-```
-<div class="game-header">
-    <div class="timer-wrap hidden-timer" id="timer-wrap">
-        <div class="timer-bar-bg">
-            <div class="timer-bar" id="timer-bar"></div>
+    <!-- ══ SETUP SCREEN ══ -->
+    <div id="setup-screen" class="hidden">
+        <div class="setup-header">
+            <button class="btn-back-profile" onclick="goToProfiles()">‹</button>
+            <div class="active-profile-badge">
+                <span class="av" id="active-avatar"></span>
+                <span class="nm" id="active-name"></span>
+            </div>
         </div>
-        <div class="timer-label" id="timer-label">–</div>
+        <p>Choisis tes tables de travail :</p>
+        <div class="selection-menu" id="selection-menu">
+            <div class="table-btn" data-n="2"  onclick="tableAction(2)">x 2<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
+            <div class="table-btn" data-n="3"  onclick="tableAction(3)">x 3<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
+            <div class="table-btn" data-n="4"  onclick="tableAction(4)">x 4<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
+            <div class="table-btn" data-n="5"  onclick="tableAction(5)">x 5<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
+            <div class="table-btn" data-n="6"  onclick="tableAction(6)">x 6<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
+            <div class="table-btn" data-n="7"  onclick="tableAction(7)">x 7<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
+            <div class="table-btn" data-n="8"  onclick="tableAction(8)">x 8<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
+            <div class="table-btn" data-n="9"  onclick="tableAction(9)">x 9<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
+            <div class="table-btn" data-n="10" onclick="tableAction(10)">x 10<div class="table-prog-wrap"><div class="table-prog-bar" style="width:0%"></div></div><span class="table-prog-pct"></span></div>
+        </div>
+        <div class="setup-footer">
+            <button class="btn-start" onclick="startGame()" id="start-btn" disabled>Commencer l'entraînement</button>
+            <div class="reset-section">
+                <button class="reset-trigger-btn" id="reset-trigger-btn" onclick="enterResetMode()">Effacer la progression…</button>
+                <div class="reset-controls" id="reset-controls">
+                    <p class="reset-hint">Sélectionne les tables à remettre à zéro :</p>
+                    <div class="reset-actions">
+                        <button class="btn-reset-cancel" onclick="exitResetMode()">Annuler</button>
+                        <button class="btn-reset-confirm" id="btn-reset-confirm" onclick="confirmReset()" disabled>Effacer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <button class="btn-stop" id="btn-stop" title="Pause">⏸</button>
-</div>
 
-<div id="flashcard" class="card">?</div>
-<div id="answer-display" class="answer-display empty">?</div>
-<div class="feedback" id="feedback"></div>
+    <!-- ══ GAME SCREEN ══ -->
+    <div id="game-screen" class="hidden">
+        <div id="flashcard" class="card">?</div>
+        <div id="answer-display" class="answer-display empty">?</div>
+        <div class="feedback" id="feedback"></div>
 
-<div class="numpad" id="numpad">
-    <div class="num-btn" onclick="numPress(7)">7</div>
-    <div class="num-btn" onclick="numPress(8)">8</div>
-    <div class="num-btn" onclick="numPress(9)">9</div>
-    <div class="num-btn" onclick="numPress(4)">4</div>
-    <div class="num-btn" onclick="numPress(5)">5</div>
-    <div class="num-btn" onclick="numPress(6)">6</div>
-    <div class="num-btn" onclick="numPress(1)">1</div>
-    <div class="num-btn" onclick="numPress(2)">2</div>
-    <div class="num-btn" onclick="numPress(3)">3</div>
-    <div class="num-btn del" onclick="numDel()">⌫</div>
-    <div class="num-btn" onclick="numPress(0)">0</div>
-    <div class="num-btn ok disabled" id="btn-ok" onclick="checkAnswer()">OK</div>
-</div>
+        <div class="numpad" id="numpad">
+            <div class="num-btn" onclick="numPress(7)">7</div>
+            <div class="num-btn" onclick="numPress(8)">8</div>
+            <div class="num-btn" onclick="numPress(9)">9</div>
+            <div class="num-btn" onclick="numPress(4)">4</div>
+            <div class="num-btn" onclick="numPress(5)">5</div>
+            <div class="num-btn" onclick="numPress(6)">6</div>
+            <div class="num-btn" onclick="numPress(1)">1</div>
+            <div class="num-btn" onclick="numPress(2)">2</div>
+            <div class="num-btn" onclick="numPress(3)">3</div>
+            <div class="num-btn del" onclick="numDel()">⌫</div>
+            <div class="num-btn" onclick="numPress(0)">0</div>
+            <div class="num-btn ok disabled" id="btn-ok" onclick="checkAnswer()">OK</div>
+        </div>
 
-<div class="buildings">
-    <div class="building" id="bld-1">
-        <div class="icon">🛖</div>
-        <div class="count" id="b1">0</div>
-        <div class="label">Cabane</div>
-        <div class="timer-hint">∞</div>
-    </div>
-    <div class="building" id="bld-2">
-        <div class="icon">🏠</div>
-        <div class="count" id="b2">0</div>
-        <div class="label">Maison</div>
-        <div class="timer-hint">30s</div>
-    </div>
-    <div class="building" id="bld-3">
-        <div class="icon">🏯</div>
-        <div class="count" id="b3">0</div>
-        <div class="label">Manoir</div>
-        <div class="timer-hint">15s</div>
-    </div>
-    <div class="building" id="bld-4">
-        <div class="icon">🏰</div>
-        <div class="count" id="b4">0</div>
-        <div class="label">Château</div>
-        <div class="timer-hint">5s</div>
-    </div>
-    <div class="building" id="bld-5">
-        <div class="icon">👑</div>
-        <div class="count" id="b5">0</div>
-        <div class="label">Palais</div>
-        <div class="timer-hint">–</div>
-    </div>
-</div>
+        <!-- Animals bar -->
+        <div class="animals">
+            <div class="animal" id="ani-1">
+                <div class="icon">🐌</div>
+                <div class="count" id="a1">0</div>
+                <div class="label">Escargot</div>
+                <div class="speed-hint">&gt;30s</div>
+            </div>
+            <div class="animal" id="ani-2">
+                <div class="icon">🐢</div>
+                <div class="count" id="a2">0</div>
+                <div class="label">Tortue</div>
+                <div class="speed-hint">15-30s</div>
+            </div>
+            <div class="animal" id="ani-3">
+                <div class="icon">🐇</div>
+                <div class="count" id="a3">0</div>
+                <div class="label">Lapin</div>
+                <div class="speed-hint">5-15s</div>
+            </div>
+            <div class="animal" id="ani-4">
+                <div class="icon">🐆</div>
+                <div class="count" id="a4">0</div>
+                <div class="label">Guépard</div>
+                <div class="speed-hint">3-5s</div>
+            </div>
+            <div class="animal" id="ani-5">
+                <div class="icon">🚀</div>
+                <div class="count" id="a5">0</div>
+                <div class="label">Fusée</div>
+                <div class="speed-hint">&lt;3s</div>
+            </div>
+        </div>
 
-<div class="game-footer">
-    <button class="link-btn" onclick="backToMenu()">Changer de tables</button>
-</div>
+        <div class="game-footer">
+            <button class="link-btn" onclick="backToMenu()">Changer de tables</button>
+        </div>
 
-<!-- PAUSE OVERLAY -->
-<div id="pause-overlay" class="hidden">
-    <div class="pause-box">
-        <div class="pause-icon">⏸️</div>
-        <div class="pause-title">Pause !</div>
-        <div class="pause-sub">Le jeu est en pause.<br>Reprends quand tu es prêt !</div>
-        <button class="btn-resume" onclick="resumeGame()">▶ Continuer</button>
     </div>
-</div>
-```
-
-</div>
 
 </div><!-- .container -->
 
 <script>
-    var deck = JSON.parse(localStorage.getItem('multipliLeitnerV3')) || [];
+    /* ══════════════════════════════════════════
+       SPEED → BOX mapping
+       >30s  → B1 (🐌)
+       20-30 → B2 (🐢)
+       10-20 → B3 (🐇)
+       5-10  → B4 (🐆)
+       <5s   → B5 (🚀)
+    ══════════════════════════════════════════ */
+
+    function timeToBox(seconds) {
+        if (seconds > 30) return 1;
+        if (seconds > 15) return 2;
+        if (seconds > 5)  return 3;
+        if (seconds > 3)  return 4;
+        return 5;
+    }
+
+    var ANIMAL_LABELS = { 1: 'Escargot', 2: 'Tortue', 3: 'Lapin', 4: 'Guépard', 5: 'Fusée' };
+    var BOX_WEIGHTS   = { 1: 8, 2: 4, 3: 2, 4: 1, 5: 1 };
+
+    /* ══ STORAGE ══ */
+    var STORAGE_KEY  = 'champTableProfiles';
+    var AVATARS      = ['🦁','🐯','🦊','🐼','🐸','🐙','🦄','🐧','🦋','🐻','🐺','🦖'];
+
+    var profiles      = [];
+    var activeProfile = null;
+    var deck          = [];
+
+    function loadData() {
+        try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) { profiles = JSON.parse(raw).profiles || []; }
+        } catch(e) { profiles = []; }
+    }
+    function saveData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ profiles: profiles }));
+    }
+    function getProfile(id) { return profiles.find(function(p) { return p.id === id; }); }
+
+    /* ══ GAME STATE ══ */
     var selectedTables = [];
     var currentCard    = null;
     var currentInput   = '';
     var inputLocked    = false;
-    var paused         = false;  // true = overlay visible, game frozen
-    var pausePending   = false;  // true = pause requested, waiting for end of question
+    var questionStart  = 0;
+    var resetMode      = false;
+    var tablesToReset  = [];
 
-    var resetMode     = false;
-    var tablesToReset = [];
+    /* ══ PROFILE SCREEN ══ */
+    var selectedAvatar = AVATARS[0];
 
-    var timerInterval    = null;
-    var timerSecondsLeft = 0;
-    var timerTotal       = 0;
+    function renderProfileScreen() {
+        var list = document.getElementById('profile-list');
+        list.innerHTML = '';
+        if (profiles.length === 0) {
+            list.innerHTML = '<p style="color:#bdc3c7;font-size:0.85rem;text-align:center;padding:20px 0;">Aucun profil pour l\'instant.<br>Crée-en un pour commencer !</p>';
+        }
+        profiles.forEach(function(p) {
+            var totalCards = p.deck.length;
+            var doneCards  = p.deck.filter(function(c) { return c.box === 5; }).length;
+            var statsText  = totalCards === 0 ? 'Pas encore commencé'
+                : doneCards + ' / ' + totalCards + ' cartes Fusée 🚀';
+            var item = document.createElement('div');
+            item.className = 'profile-item';
+            item.innerHTML =
+                '<div class="profile-avatar">' + p.avatar + '</div>' +
+                '<div class="profile-info">' +
+                    '<div class="profile-name">' + escHtml(p.name) + '</div>' +
+                    '<div class="profile-stats">' + statsText + '</div>' +
+                '</div>' +
+                '<div class="profile-arrow">›</div>' +
+                '<button class="profile-delete-btn" data-id="' + p.id + '" title="Supprimer">🗑</button>';
+            item.addEventListener('click', function(e) {
+                if (e.target.closest('.profile-delete-btn')) return;
+                selectProfile(p.id);
+            });
+            item.querySelector('.profile-delete-btn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                deleteProfile(p.id);
+            });
+            list.appendChild(item);
+        });
+    }
 
-    var BOX_TIMERS  = { 1: null, 2: 30, 3: 15, 4: 5, 5: null };
-    var BOX_WEIGHTS = { 1: 8,    2: 4,  3: 2,  4: 1 };
+    function selectProfile(id) {
+        activeProfile  = getProfile(id);
+        deck           = activeProfile.deck;
+        selectedTables = [];
+        document.getElementById('active-avatar').textContent = activeProfile.avatar;
+        document.getElementById('active-name').textContent   = activeProfile.name;
+        showScreen('setup-screen');
+        exitResetMode();
+        renderSelectionButtons();
+        document.getElementById('start-btn').disabled = true;
+    }
+
+    var pendingDeleteId = null;
+
+    function deleteProfile(id) {
+        var p = getProfile(id);
+        if (!p) return;
+        pendingDeleteId = id;
+        document.getElementById('delete-name').textContent = p.name;
+        document.getElementById('delete-overlay').classList.remove('hidden');
+    }
+
+    function confirmDelete() {
+        if (!pendingDeleteId) return;
+        profiles = profiles.filter(function(p) { return p.id !== pendingDeleteId; });
+        pendingDeleteId = null;
+        saveData();
+        document.getElementById('delete-overlay').classList.add('hidden');
+        renderProfileScreen();
+    }
+
+    function cancelDelete() {
+        pendingDeleteId = null;
+        document.getElementById('delete-overlay').classList.add('hidden');
+    }
+
+    function goToProfiles() {
+        activeProfile = null; deck = []; selectedTables = [];
+        showScreen('profile-screen');
+        renderProfileScreen();
+    }
+
+    function renderAvatarPicker() {
+        var picker = document.getElementById('avatar-picker');
+        picker.innerHTML = '';
+        AVATARS.forEach(function(av, i) {
+            var span = document.createElement('span');
+            span.className = 'avatar-opt' + (i === 0 ? ' selected' : '');
+            span.textContent = av;
+            span.addEventListener('click', function() {
+                document.querySelectorAll('.avatar-opt').forEach(function(s) { s.classList.remove('selected'); });
+                span.classList.add('selected');
+                selectedAvatar = av;
+            });
+            picker.appendChild(span);
+        });
+        selectedAvatar = AVATARS[0];
+    }
+
+    function showProfileForm() {
+        document.getElementById('profile-add-row').style.display = 'none';
+        renderAvatarPicker();
+        document.getElementById('profile-name-input').value = '';
+        document.getElementById('btn-profile-save').disabled = true;
+        document.getElementById('profile-form').classList.add('visible');
+    }
+
+    function hideProfileForm() {
+        document.getElementById('profile-form').classList.remove('visible');
+        document.getElementById('profile-add-row').style.display = '';
+    }
+
+    function onNameInput() {
+        var val = document.getElementById('profile-name-input').value.trim();
+        document.getElementById('btn-profile-save').disabled = val.length === 0;
+    }
+
+    function saveNewProfile() {
+        var name = document.getElementById('profile-name-input').value.trim();
+        if (!name) return;
+        var profile = { id: Date.now().toString(), name: name, avatar: selectedAvatar, deck: [] };
+        profiles.push(profile);
+        saveData();
+        hideProfileForm();
+        renderProfileScreen();
+    }
+
+    function escHtml(str) {
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ══ SCREEN NAV ══ */
+    function showScreen(id) {
+        ['profile-screen','setup-screen','game-screen'].forEach(function(s) {
+            document.getElementById(s).classList.toggle('hidden', s !== id);
+        });
+    }
 
     /* ══ SETUP ══ */
-
     function tableAction(n) {
-        if (resetMode) toggleResetTable(n);
-        else           toggleTable(n);
+        if (resetMode) toggleResetTable(n); else toggleTable(n);
     }
 
     function toggleTable(n) {
         var idx = selectedTables.indexOf(n);
-        if (idx > -1) selectedTables.splice(idx, 1);
-        else selectedTables.push(n);
+        if (idx > -1) selectedTables.splice(idx, 1); else selectedTables.push(n);
         renderSelectionButtons();
         document.getElementById('start-btn').disabled = selectedTables.length === 0;
     }
 
-    // Returns 0-100 progress % for a given table (box 5 = fully learned)
     function getTableProgress(n) {
         var cards = deck.filter(function(c) { return c.a === n; });
         if (cards.length === 0) return 0;
-        // Each card contributes (box-1)/4 of its share (box 5 = 100%, box 1 = 0%)
         var total = cards.reduce(function(sum, c) { return sum + (c.box - 1); }, 0);
         return Math.round((total / (cards.length * 4)) * 100);
     }
@@ -528,7 +696,6 @@ h1 {
             } else {
                 if (selectedTables.includes(n)) btn.classList.add('active');
             }
-            // Update progress bar & label
             var pct = getTableProgress(n);
             var bar = btn.querySelector('.table-prog-bar');
             var lbl = btn.querySelector('.table-prog-pct');
@@ -538,8 +705,7 @@ h1 {
     }
 
     function enterResetMode() {
-        resetMode = true;
-        tablesToReset = [];
+        resetMode = true; tablesToReset = [];
         document.getElementById('reset-trigger-btn').style.display = 'none';
         document.getElementById('reset-controls').classList.add('visible');
         document.getElementById('start-btn').disabled = true;
@@ -547,8 +713,7 @@ h1 {
     }
 
     function exitResetMode() {
-        resetMode = false;
-        tablesToReset = [];
+        resetMode = false; tablesToReset = [];
         document.getElementById('reset-trigger-btn').style.display = '';
         document.getElementById('reset-controls').classList.remove('visible');
         document.getElementById('btn-reset-confirm').disabled = true;
@@ -558,8 +723,7 @@ h1 {
 
     function toggleResetTable(n) {
         var idx = tablesToReset.indexOf(n);
-        if (idx > -1) tablesToReset.splice(idx, 1);
-        else tablesToReset.push(n);
+        if (idx > -1) tablesToReset.splice(idx, 1); else tablesToReset.push(n);
         document.getElementById('btn-reset-confirm').disabled = tablesToReset.length === 0;
         renderSelectionButtons();
     }
@@ -568,12 +732,12 @@ h1 {
         if (tablesToReset.length === 0) return;
         deck = deck.filter(function(c) { return !tablesToReset.includes(c.a); });
         selectedTables = selectedTables.filter(function(n) { return !tablesToReset.includes(n); });
-        save();
+        activeProfile.deck = deck;
+        saveData();
         exitResetMode();
     }
 
     /* ══ GAME START ══ */
-
     function startGame() {
         selectedTables.forEach(function(t) {
             for (var i = 1; i <= 10; i++) {
@@ -583,53 +747,20 @@ h1 {
             }
         });
         save();
-        document.getElementById('setup-screen').classList.add('hidden');
-        document.getElementById('game-screen').classList.remove('hidden');
-        nextQuestion();
-    }
-
-    /* ══ PAUSE ══ */
-
-    function pauseGame() {
-        if (paused) return; // already paused, nothing to do
-        if (pausePending) {
-            // Second tap cancels the pending pause request
-            pausePending = false;
-            document.getElementById('btn-stop').classList.remove('pending');
-            return;
-        }
-        // Request a deferred pause — will take effect after the current question resolves
-        pausePending = true;
-        document.getElementById('btn-stop').classList.add('pending');
-    }
-
-    // Called internally whenever a question fully resolves (correct, wrong acquitted, timeout acquitted)
-    function checkPauseAfterQuestion() {
-        if (!pausePending) return false;
-        pausePending = false;
-        paused = true;
-        document.getElementById('btn-stop').classList.remove('pending');
-        document.getElementById('pause-overlay').classList.remove('hidden');
-        return true; // pause was triggered
-    }
-
-    function resumeGame() {
-        paused = false;
-        document.getElementById('pause-overlay').classList.add('hidden');
+        showScreen('game-screen');
         nextQuestion();
     }
 
     /* ══ INPUT ══ */
-
     function numPress(d) {
-        if (inputLocked || paused) return;
+        if (inputLocked) return;
         if (currentInput.length >= 3) return;
         currentInput += String(d);
         updateAnswerDisplay();
     }
 
     function numDel() {
-        if (inputLocked || paused) return;
+        if (inputLocked) return;
         currentInput = currentInput.slice(0, -1);
         updateAnswerDisplay();
     }
@@ -638,121 +769,46 @@ h1 {
         var disp = document.getElementById('answer-display');
         var ok   = document.getElementById('btn-ok');
         if (currentInput === '') {
-            disp.innerText = '?';
-            disp.className = 'answer-display empty';
+            disp.innerText = '?'; disp.className = 'answer-display empty';
             ok.classList.add('disabled');
         } else {
-            disp.innerText = currentInput;
-            disp.className = 'answer-display';
+            disp.innerText = currentInput; disp.className = 'answer-display';
             ok.classList.remove('disabled');
         }
     }
 
-    /* ══ TIMER ══ */
-
-    function startTimer(seconds) {
-        stopTimer();
-        if (!seconds) {
-            document.getElementById('timer-wrap').classList.add('hidden-timer');
-            return;
-        }
-        timerTotal = seconds;
-        timerSecondsLeft = seconds;
-        runTimer();
-    }
-
-    function resumeTimer(secondsLeft, total) {
-        stopTimer();
-        timerTotal = total;
-        timerSecondsLeft = secondsLeft;
-        runTimer();
-    }
-
-    function runTimer() {
-        var bar   = document.getElementById('timer-bar');
-        var label = document.getElementById('timer-label');
-        document.getElementById('timer-wrap').classList.remove('hidden-timer');
-
-        bar.style.transition = 'none';
-        bar.style.width = ((timerSecondsLeft / timerTotal) * 100) + '%';
-        setBarColor(bar, timerSecondsLeft, timerTotal);
-        label.innerText = timerSecondsLeft;
-        void bar.offsetWidth;
-        bar.style.transition = 'width 1s linear, background 0.4s';
-
-        timerInterval = setInterval(function() {
-            timerSecondsLeft--;
-            label.innerText = timerSecondsLeft;
-            var pct = (timerSecondsLeft / timerTotal) * 100;
-            bar.style.width = pct + '%';
-            setBarColor(bar, timerSecondsLeft, timerTotal);
-            if (timerSecondsLeft <= 0) {
-                stopTimer();
-                if (!paused) onTimeout();
-            }
-        }, 1000);
-    }
-
-    function setBarColor(bar, left, total) {
-        var pct = (left / total) * 100;
-        bar.className = pct <= 33 ? 'timer-bar danger' : pct <= 60 ? 'timer-bar warn' : 'timer-bar';
-    }
-
-    function stopTimer() {
-        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-    }
-
-    function onTimeout() {
-        if (inputLocked) return;
-        inputLocked = true;
-        var correctAnswer = currentCard.a * currentCard.b;
-        var flashcard = document.getElementById('flashcard');
-        flashcard.classList.add('wrong');
-        document.getElementById('answer-display').classList.add('wrong');
-        flashcard.classList.add('anim-shake');
-        setTimeout(function() {
-            flashcard.classList.remove('anim-shake');
-            document.getElementById('feedback').innerHTML =
-                "<p class='feedback-msg wrong'>⏰ Temps écoulé ! C'était <strong>" + correctAnswer + "</strong></p>" +
-                "<button class='btn-understood' onclick='handleWrong()'>J'ai compris</button>";
-        }, 460);
-    }
-
     /* ══ SAVE / UI ══ */
-
     function save() {
-        localStorage.setItem('multipliLeitnerV3', JSON.stringify(deck));
+        if (activeProfile) { activeProfile.deck = deck; saveData(); }
         updateUI();
     }
 
     function updateUI() {
         var activeDeck = deck.filter(function(c) { return selectedTables.includes(c.a); });
         for (var i = 1; i <= 5; i++) {
-            document.getElementById('b' + i).innerText =
+            document.getElementById('a' + i).innerText =
                 activeDeck.filter(function(c) { return c.box === i; }).length;
         }
-        highlightBuilding(currentCard ? currentCard.box : 0);
+        highlightAnimal(currentCard ? currentCard.box : 0);
     }
 
-    function highlightBuilding(n) {
-        for (var i = 1; i <= 5; i++) document.getElementById('bld-' + i).classList.remove('active');
-        if (n >= 1 && n <= 5) document.getElementById('bld-' + n).classList.add('active');
+    function highlightAnimal(n) {
+        for (var i = 1; i <= 5; i++) document.getElementById('ani-' + i).classList.remove('active');
+        if (n >= 1 && n <= 5) document.getElementById('ani-' + n).classList.add('active');
     }
 
-    function pulseBuilding(n) {
-        var bld = document.getElementById('bld-' + n);
-        if (!bld) return;
-        bld.classList.remove('pulse');
-        void bld.offsetWidth;
-        bld.classList.add('pulse');
-        setTimeout(function() { bld.classList.remove('pulse'); }, 420);
+    function pulseAnimal(n) {
+        var el = document.getElementById('ani-' + n);
+        if (!el) return;
+        el.classList.remove('pulse'); void el.offsetWidth;
+        el.classList.add('pulse');
+        setTimeout(function() { el.classList.remove('pulse'); }, 420);
     }
 
     /* ══ GAME FLOW ══ */
+    var recentCards = []; // stores last 3 card references (a*10+b as key)
 
     function nextQuestion() {
-        if (paused) return;
-        stopTimer();
 
         var activeDeck = deck.filter(function(c) { return selectedTables.includes(c.a) && c.box < 5; });
 
@@ -760,61 +816,115 @@ h1 {
             document.getElementById('flashcard').innerText = 'FINI ! ✨';
             document.getElementById('flashcard').style.fontSize = '2rem';
             document.getElementById('flashcard').className = 'card';
-            document.getElementById('feedback').innerHTML = '<p class="feedback-msg correct">Toutes les tables sont au Palais !</p>';
+            document.getElementById('feedback').innerHTML = '<p class="feedback-msg progress">Toutes les tables sont à la Fusée !</p>';
             document.getElementById('numpad').classList.add('hidden');
             document.getElementById('answer-display').classList.add('hidden');
-            document.getElementById('timer-wrap').classList.add('hidden-timer');
-            highlightBuilding(5);
+            highlightAnimal(5);
             return;
         }
 
-        var pool = [];
-        activeDeck.forEach(function(card) {
-            var w = BOX_WEIGHTS[card.box] || 1;
-            for (var i = 0; i < w; i++) pool.push(card);
-        });
-        currentCard = pool[Math.floor(Math.random() * pool.length)];
+        // Build weighted pool excluding recent cards (fallback to full pool if needed)
+        function buildPool(deck, exclude) {
+            var pool = [];
+            deck.forEach(function(card) {
+                if (exclude.indexOf(card.a + '_' + card.b) !== -1) return;
+                var w = BOX_WEIGHTS[card.box] || 1;
+                for (var i = 0; i < w; i++) pool.push(card);
+            });
+            return pool;
+        }
 
-        inputLocked = false;
-        currentInput = '';
+        var pool = buildPool(activeDeck, recentCards);
+        if (pool.length === 0) pool = buildPool(activeDeck, []); // fallback
+
+        currentCard   = pool[Math.floor(Math.random() * pool.length)];
+
+        // Update recent history (keep last 3)
+        var key = currentCard.a + '_' + currentCard.b;
+        recentCards.push(key);
+        if (recentCards.length > 3) recentCards.shift();
+
+        inputLocked   = false;
+        currentInput  = '';
+
         var fc = document.getElementById('flashcard');
         fc.innerText = currentCard.a + ' × ' + currentCard.b;
-        fc.style.fontSize = '';
-        fc.className = 'card';
+        fc.style.fontSize = ''; fc.className = 'card';
         document.getElementById('feedback').innerHTML = '';
         document.getElementById('numpad').classList.remove('hidden');
         document.getElementById('answer-display').classList.remove('hidden');
         updateAnswerDisplay();
         updateUI();
-        startTimer(BOX_TIMERS[currentCard.box]);
+
+        // Start stopwatch (invisible to student)
+        questionStart = performance.now();
     }
 
     function checkAnswer() {
-        if (inputLocked || paused || currentInput === '') return;
-        stopTimer();
+        if (inputLocked || currentInput === '') return;
         inputLocked = true;
 
+        var elapsed       = (performance.now() - questionStart) / 1000; // seconds
+        var elapsedStr    = elapsed.toFixed(1) + 's';
         var userAnswer    = parseInt(currentInput);
         var correctAnswer = currentCard.a * currentCard.b;
+        var isCorrect     = userAnswer === correctAnswer;
+
         var fc   = document.getElementById('flashcard');
         var disp = document.getElementById('answer-display');
         var fb   = document.getElementById('feedback');
 
-        if (userAnswer === correctAnswer) {
-            fc.classList.add('correct');
+        if (isCorrect) {
+            var oldBox = currentCard.box;
+            var newBox = timeToBox(elapsed);
+
             disp.classList.add('correct');
-            fb.innerHTML = '<p class="feedback-msg correct">✅ Bravo !</p>';
-            var nextBox = Math.min(currentCard.box + 1, 5);
-            fc.classList.add('anim-fly-right');
-            setTimeout(function() {
-                currentCard.box = nextBox;
-                save();
-                pulseBuilding(nextBox);
-                setTimeout(function() {
-                    if (!checkPauseAfterQuestion()) nextQuestion();
-                }, 430);
-            }, 430);
+
+            var msgClass, msgText, btnClass;
+            if (newBox > oldBox) {
+                // Progress
+                fc.classList.add('correct-progress');
+                msgClass = 'progress';
+                msgText  = '🎉 Bravo ! Tu progresses vers ' + ANIMAL_LABELS[newBox] + ' ' + animalIcon(newBox);
+                btnClass = '';
+                if (newBox >= 4) {
+                    // Joke reward for reaching guépard or fusée
+                    fb.innerHTML =
+                        '<p class="feedback-msg ' + msgClass + '">' + msgText + '</p>' +
+                        '<p class="feedback-time">⏱ ' + elapsedStr + '</p>' +
+                        '<p class="joke-text" id="joke-text"></p>' +
+                        '<button class="btn-next" id="btn-next-joke" onclick="handleCorrect(' + newBox + ')">Suivant ›</button>';
+                    fetchJoke(newBox);
+                } else {
+                    fb.innerHTML =
+                        '<p class="feedback-msg ' + msgClass + '">' + msgText + '</p>' +
+                        '<p class="feedback-time">⏱ ' + elapsedStr + '</p>' +
+                        '<button class="btn-next" onclick="handleCorrect(' + newBox + ')">Suivant ›</button>';
+                }
+            } else if (newBox === oldBox) {
+                // Same box
+                fc.classList.add('correct-same');
+                msgClass = 'same';
+                msgText  = '👍 Bien, mais essaie d\'être plus rapide !';
+                btnClass = 'orange';
+                fb.innerHTML =
+                    '<p class="feedback-msg ' + msgClass + '">' + msgText + '</p>' +
+                    '<p class="feedback-time">⏱ ' + elapsedStr + '</p>' +
+                    '<button class="btn-next ' + btnClass + '" onclick="handleCorrect(' + newBox + ')">Suivant ›</button>';
+            } else {
+                // Regress
+                fc.classList.add('correct-regress');
+                msgClass = 'regress';
+                msgText  = '😅 Moins bien que la dernière fois…';
+                btnClass = '';
+                fb.innerHTML =
+                    '<p class="feedback-msg ' + msgClass + '">' + msgText + '</p>' +
+                    '<p class="feedback-time">⏱ ' + elapsedStr + '</p>' +
+                    '<button class="btn-next ' + btnClass + '" onclick="handleCorrect(' + newBox + ')">Suivant ›</button>';
+            }
+
         } else {
+            // Wrong answer
             fc.classList.add('wrong');
             disp.classList.add('wrong');
             fc.classList.add('anim-shake');
@@ -822,43 +932,193 @@ h1 {
                 fc.classList.remove('anim-shake');
                 fb.innerHTML =
                     "<p class='feedback-msg wrong'>❌ Faux ! C'était <strong>" + correctAnswer + "</strong></p>" +
+                    '<p class="feedback-time">⏱ ' + elapsedStr + '</p>' +
                     "<button class='btn-understood' onclick='handleWrong()'>J'ai compris</button>";
             }, 460);
         }
+    }
+
+    function animalIcon(box) {
+        var icons = { 1:'🐌', 2:'🐢', 3:'🐇', 4:'🐆', 5:'🚀' };
+        return icons[box] || '';
+    }
+
+    function handleCorrect(newBox) {
+        var fc = document.getElementById('flashcard');
+        fc.classList.add('anim-fly-right');
+        setTimeout(function() {
+            currentCard.box = newBox;
+            save();
+            pulseAnimal(newBox);
+            setTimeout(nextQuestion, 430);
+        }, 430);
     }
 
     function handleWrong() {
         var fc = document.getElementById('flashcard');
         fc.classList.add('anim-fly-left');
         setTimeout(function() {
-            currentCard.box = Math.max(currentCard.box - 1, 1);
+            currentCard.box = 1;
             save();
-            pulseBuilding(currentCard.box);
-            setTimeout(function() {
-                if (!checkPauseAfterQuestion()) nextQuestion();
-            }, 430);
+            pulseAnimal(1);
+            setTimeout(nextQuestion, 430);
         }, 430);
     }
 
     function backToMenu() {
-        stopTimer();
-        paused = false;
-        pausePending = false;
-        document.getElementById('btn-stop').classList.remove('pending');
-        document.getElementById('pause-overlay').classList.add('hidden');
-        document.getElementById('setup-screen').classList.remove('hidden');
-        document.getElementById('game-screen').classList.add('hidden');
         currentCard = null;
+        showScreen('setup-screen');
         exitResetMode();
+        renderSelectionButtons();
     }
 
-    // Wire up buttons that can't use inline onclick safely
-    document.getElementById('btn-stop').addEventListener('click', pauseGame);
+    var JOKES = [
+        // Tes validées
+        "Pourquoi les plongeurs plongent-ils toujours en arrière et jamais en avant ? Parce que sinon ils tomberaient dans le bateau !",
+        "Pourquoi les vaches portent-elles des cloches ? Parce que leurs cornes ne font pas de bruit !",
+        "Comment appelle-t-on un chat tombé dans un pot de peinture le jour de Noël ? Un chat-peint de Noël !",
+        "Qu'est-ce qu'un canif ? Un petit fien !",
+        "Pourquoi est-ce que les fantômes sont mauvais menteurs ? Parce qu'on voit à travers eux !",
+        "Comment appelle-t-on un chien sans pattes ? Peu importe comment tu l'appelles, il viendra pas !",
+        "Qu'est-ce qu'un chat qui tombe de 50 étages ? Un chat-tastrophe !",
+        "Qu'est-ce qu'un boomerang qui ne revient pas ? Un bâton !",
+        "Pourquoi les girafes ont-elles un long cou ? Parce que leurs pieds sentent mauvais !",
+        "Comment appelle-t-on un dinosaure qui fait du vélo ? Un vélorapteur !",
+        "Pourquoi les bananes se mettent-elles de la crème solaire ? Pour ne pas devenir des bananes séchées !",
+        // Yoojo 3 ans
+        "Que dit un nuage quand il rencontre un autre nuage ? Pourquoi tu pleures ?",
+        "Qu'est-ce qui est petit, marron et qui attend ? Un marron patient !",
+        "Qu'est-ce qui est petit, vert et qui monte et qui descend ? Un petit pois dans un ascenseur !",
+        "Pourquoi est-ce que les poissons nagent-ils en groupe ? Parce qu'ils n'ont pas envie de marcher !",
+        // Yoojo 4 ans
+        "Pourquoi les oiseaux n'ont pas d'argent ? Parce qu'ils ont peur de se faire plumer !",
+        "Que dit un escargot quand il voit passer une limace ? Waaaa la décapotable !",
+        "Pourquoi est-ce que le chewing-gum traverse la route ? Parce qu'il est collé sous la chaussure du facteur !",
+        "Que demande un zéro à un huit ? T'as mis une ceinture ?",
+        "Pourquoi les requins ne mangent-ils pas les clowns ? Parce qu'ils ont un drôle de goût !",
+        "J'ai un chapeau mais je n'ai pas de tête. Qu'est-ce que je suis ? Un clou !",
+        "Pourquoi est-ce que les escargots bavent ? Parce qu'ils ont oublié leur mouchoir !",
+        "Pourquoi les éléphants ne jouent-ils jamais aux cartes ? Parce qu'ils ont peur de se tromper !",
+        // Yoojo 5 ans
+        "Qu'est-ce qui est jaune et qui attend ? Jonathan !",
+        "Que dit un crayon à papier à un autre crayon à papier ? Tu fais quelle taille ?",
+        "Pourquoi les bananes ne peuvent-elles pas se promener toutes seules ? Parce qu'elles n'ont pas de jambes !",
+        "Qu'est-ce qui est petit, jaune et qui court très vite ? Un citron pressé !",
+        "Qu'est-ce qui est petit, orange et qui monte et qui descend ? Un yo-yorange !",
+        "Pourquoi les canards ne tournent jamais en rond ? Parce qu'ils préfèrent les coin-coin !",
+        "Toc Toc ! Qui est là ? Sacha. Sacha qui ? Sacha touille !",
+        "Toc Toc ! Qui est là ? Jean. Jean qui ? Jean tends le loup, le renard et la belette !",
+        // Yoojo 6 ans
+        "Pourquoi les chiens remuent-ils la queue quand ils sont heureux ? Parce qu'ils n'ont pas de mains pour applaudir !",
+        "Quel est le fruit le plus drôle ? La banane, parce qu'elle a toujours la pêche !",
+        "Qu'est-ce qu'une orange dit à une autre orange fatiguée ? Alors, tu manques de jus ?",
+        "Quel est le gâteau le plus rapide ? L'éclair !",
+        "Pourquoi les souris n'aiment pas jouer aux devinettes ? Parce qu'elles ont peur de donner leur langue au chat !",
+        "J'ai deux pieds, six jambes, huit bras, deux têtes et un œil. Qui suis-je ? Un menteur !",
+        "Quelle est la pire chose qui puisse arriver à un ballon de foot ? D'être crevé !",
+        "Qu'est-ce qui a des dents, mais ne peut pas manger ? Un peigne !",
+        "Que dit une puce à une autre puce ? On y va à pied ou on attend le chien ?",
+        "Toc Toc ! Qui est là ? Sam. Sam qui ? Sam énerve tes questions là !",
+        // Yoojo 7 ans
+        "Pourquoi est-ce que les poissons n'ont jamais chaud ? Parce qu'ils vivent dans l'eau fraîche !",
+        "Pourquoi est-ce que les pingouins sont toujours habillés en noir et blanc ? Parce que ça leur va très bien !",
+        "Quel est le comble pour un électricien ? De se faire des ampoules aux doigts !",
+        "Pourquoi les kangourous ne font-ils jamais de courses ? Parce qu'ils ont déjà tout dans leur poche !",
+        "Que dit un crayon à papier à un autre crayon à papier ? T'as l'air bien taillé aujourd'hui !",
+        "Le professeur demande à son élève : 3 et 3 ça fait quoi ? Match nul monsieur !",
+        "Qu'est-ce qui tombe sans tomber ? La nuit !",
+        "L'astronaute qui a fait le premier pas sur la lune, qu'est-ce qu'il a fait ensuite ? Il a posé son deuxième pied !",
+        "Qu'est-ce qui est jaune et qui est dans l'arbre ? La voiture du facteur qui a raté le virage !",
+        "Comment appelle-t-on une vieille barbe à papa ? Une barbe à papi !",
+        "Quel est le pain préféré des magiciens ? La baguette !",
+        // Yoojo 8 ans
+        "Qu'est-ce qui peut faire le tour du monde en restant dans son coin ? Un timbre !",
+        "Qu'est-ce qu'un arbre dit à un autre arbre bien habillé ? T'es trop branché !",
+        "Que fait un crayon après avoir fait une bêtise ? Il fait mine de rien !",
+        "Quel est le comble pour un clown ? De ne jamais être pris au sérieux !",
+        "Qu'est-ce qu'un escargot dit à un autre escargot quand il pleut ? Ça mouille, mais ça ne va pas nous ralentir !",
+        "Pourquoi est-ce que les oiseaux ne portent jamais de sac à dos ? Parce qu'ils ont déjà leurs plumes pour voyager léger !",
+        "Pourquoi les pommes de terre sont-elles toujours de bonne humeur ? Parce qu'elles ont la patate !",
+        "Je ne fais pas de bruit et pourtant je réveille tout le monde. Qui suis-je ? Le soleil !",
+        "Pourquoi est-ce que les éléphants ne peuvent pas utiliser d'ordinateurs ? Parce qu'ils ont peur de la souris !",
+        // Yoojo 9 ans
+        "Quel légume peut nager sous l'eau ? Le chou-marin !",
+        "Pourquoi est-ce que les crayons sont les meilleurs artistes ? Parce qu'ils ont tous un trait d'humour !",
+        "Qu'est-ce que le footballeur demande au coiffeur ? Une belle coupe !",
+        "Qu'est-ce qu'un livre dit à un autre livre quand ils sont fatigués ? Prends ta couverture, on va au lit !",
+        "Pourquoi est-ce que les girafes n'aiment pas la boxe ? Parce qu'elles ont déjà un grand cou !",
+        "Quel est le légume le plus explosif ? La roquette !",
+        "Un dromadaire rencontre un chameau et lui dit : Que fais-tu ? Je bosse, je bosse ! Et toi ? Je bosse !",
+        "Qu'est-ce qui a des pieds, mais ne peut pas marcher ? Une table !",
+        "Qu'est-ce qu'il ne faut jamais faire devant un poisson scie ? La planche !",
+        "Qu'est-ce qui tombe tous les jours mais ne se fait jamais mal ? La nuit !",
+        // Yoojo 10 ans
+        "Qu'est-ce qu'une voiture dit à une autre voiture qui ne sait pas chanter ? T'es sûr que c'est la bonne voie ?",
+        "Qu'est-ce qu'une tortue dit à une autre tortue qui lui fait des chatouilles ? Arrête, c'est de la torture !",
+        "Qu'est-ce qu'une feuille dit à une autre feuille quand elles rigolent ? Arrête ! Je suis plié de rire !",
+        "Quel est le légume le plus explosif ? La grenade !",
+        "Quelle est la différence entre un thermomètre et un maître d'école ? Aucune. On tremble quand ils affichent zéro !",
+        "Quelle est la différence entre un avion et un chewing-gum ? Le chewing-gum ça colle et un avion ça décolle !",
+        "Quel est le comble pour un électricien ? D'avoir les idées noires !",
+        "Quel est le comble pour un jardinier ? D'avoir un jardin secret !",
+        "Sais-tu quel est l'animal le plus léger au monde ? La palourde !",
+        "Qu'est-ce qui arrive à un ballon de foot quand on lui raconte une blague ? Il éclate de rire !",
+        // Yoojo 11 ans
+        "Pourquoi les tortues n'ont-elles jamais de problème de logement ? Parce qu'elles ont leur maison sur le dos !",
+        "Pourquoi le kangourou ne se perd-il jamais ? Parce qu'il connaît la route comme sa poche !",
+        "Que fait un crabe quand il rencontre un autre crabe ? Il lui sert la pince !",
+        "Pourquoi les électriciens n'aiment-ils pas les ragots ? Parce qu'ils détestent être au courant !",
+        "Qu'est-ce qu'une étoile dit à une autre étoile quand elle ne comprend rien ? T'es pas très brillante, dis-donc !",
+        "Quel est le comble pour un vélo ? C'est de perdre les pédales !",
+        "Un élève arrive en retard à l'école. La maîtresse demande pourquoi. Parce que j'ai rêvé d'un match de foot. Et alors ? Il y a eu des prolongations !",
+        "Monsieur et Madame Fonfek ont une fille, comment s'appelle-t-elle ? Sophie Fonfek !",
+        "Monsieur et Madame Deuf ont un fils, comment s'appelle-t-il ? John, le jaune d'œuf !",
+        "Quel est le comble pour un jardinier ? Raconter des salades !",
+        // Yoojo 12 ans
+        "Pourquoi est-ce que les chats aiment la nourriture italienne ? Parce qu'ils adorent lécher les pâtes !",
+        "Pourquoi est-ce que les pingouins sont toujours prêts pour une soirée ? Parce qu'ils ont toujours un smoking sur le dos !",
+        "Comment appelle-t-on un hippopotame qui fait du camping ? Un hippocampe !",
+        "Quelle est la situation la plus triste pour un footballeur ? Ne pas avoir de but dans la vie !",
+        "Quel est le point commun entre un arbitre et un déménageur ? Ils sortent tous les deux les cartons !",
+        "Tu connais la blague de la chaise ? Elle est pliante !",
+        "Qu'est-ce qui est plein de trous, mais peut quand même contenir de l'eau ? Une éponge !",
+        "Pourquoi le cahier de mathématiques est-il toujours triste ? Parce qu'il a trop de problèmes !",
+        // Yoojo ados
+        "Pourquoi une souris aime bien se faire photographier ? Parce qu'on lui dit cheese !",
+        "Qu'est-ce qu'un téléphone dit à un autre téléphone quand il est fatigué ? J'ai vraiment besoin de me recharger les batteries !",
+        "Pourquoi est-ce que les ordinateurs sont toujours mouillés ? Parce qu'ils passent leur temps à surfer sur le net !",
+        "Que dit un stylo vide quand on recharge son encre ? Ça tombe à Bic !",
+        "Qu'est-ce qu'une montre dit à une autre montre en retard ? Au temps pour moi, j'ai pas vu les minutes passer !",
+        "Pourquoi est-ce que les cactus adorent la cuisine mexicaine ? Parce qu'ils aiment quand ça pique !",
+        "Pourquoi est-ce que les électriciens sont toujours de bonne humeur ? Parce qu'ils sont toujours positifs !",
+        "Tu connais l'histoire du lit superposé ? C'est une histoire à dormir debout !",
+        "Quel est le comble pour un électricien ? De ne pas être au courant !",
+        "Que se passe-t-il quand on mange un ballon de football ? On se sent ballonné !",
+        "Quel est le footballeur le plus honnête sur le terrain ? Celui qui tire les coups francs !",
+        "Pourquoi est-ce que les pommes de terre ne peuvent pas jouer au football ? Parce qu'elles sont toujours en train de se faire peler !"
+    ];
+    var recentJokes = [];
 
-    // Show progress on first load
-    renderSelectionButtons();
+    function getJoke() {
+        var available = JOKES.filter(function(j) { return recentJokes.indexOf(j) === -1; });
+        if (available.length === 0) { recentJokes = []; available = JOKES; }
+        var joke = available[Math.floor(Math.random() * available.length)];
+        recentJokes.push(joke);
+        if (recentJokes.length > 5) recentJokes.shift();
+        return joke;
+    }
 
+    function fetchJoke(newBox) {
+        var joke = getJoke();
+        var jokeEl = document.getElementById('joke-text');
+        var btnEl  = document.getElementById('btn-next-joke');
+        if (jokeEl) jokeEl.textContent = '😂 ' + joke;
+        if (btnEl)  btnEl.disabled = false;
+    }
+
+    /* ══ INIT ══ */
+    loadData();
+    renderProfileScreen();
 </script>
-
 </body>
 </html>
